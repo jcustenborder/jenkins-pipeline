@@ -6,9 +6,9 @@ class MavenUtilities {
     MavenUtilities(steps) { this.steps = steps; }
 
     def changeVersion(String mvnHome, String version) {
-        if (env.BRANCH_NAME == 'master') {
-            steps.sh "${mvnHome}/bin/mvn -B versions:set -DgenerateBackupPoms=false -DnewVersion=${version}"
-        }
+//        if (env.BRANCH_NAME == 'master') {
+//            steps.sh "${mvnHome}/bin/mvn -B versions:set -DgenerateBackupPoms=false -DnewVersion=${version}"
+//        }
     }
 
 
