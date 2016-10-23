@@ -1,17 +1,15 @@
 package com.github.jcustenborder.jenkins.pipeline
 
-class MavenUtilities {
+class MavenUtilities implements Serializable {
     def steps
 
     MavenUtilities(steps) { this.steps = steps; }
 
     @NonCPS
     def changeVersion(String mvnHome, String version) {
-//        if (env.BRANCH_NAME == 'master') {
-//            steps.sh "${mvnHome}/bin/mvn -B versions:set -DgenerateBackupPoms=false -DnewVersion=${version}"
-//        }
+        if (env.BRANCH_NAME == 'master') {
+            steps.sh "${mvnHome}/bin/mvn -B versions:set -DgenerateBackupPoms=false -DnewVersion=${version}"
+        }
     }
-
-
 }
 
