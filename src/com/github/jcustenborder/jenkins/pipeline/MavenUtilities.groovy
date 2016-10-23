@@ -1,4 +1,4 @@
-package com.github.jcustenborder.jenkins.pipeline;
+package com.github.jcustenborder.jenkins.pipeline
 
 class MavenUtilities {
     def steps
