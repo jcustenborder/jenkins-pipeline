@@ -21,7 +21,7 @@ class MavenUtilities implements Serializable {
             commandLine << " --settings ${this.settings}"
         }
 
-        if (null != this.settings) {
+        if (null != this.profiles) {
             commandLine << " -P ${profiles}"
         }
 
