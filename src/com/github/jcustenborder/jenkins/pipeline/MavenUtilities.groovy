@@ -2,8 +2,9 @@ package com.github.jcustenborder.jenkins.pipeline
 
 class MavenUtilities implements Serializable {
     def steps
+    def settings;
 
-    MavenUtilities(steps) { this.steps = steps; }
+    MavenUtilities(steps, settings) { this.steps = steps; this.settings = settings }
 
     def changeVersion(String version) {
         if (env.BRANCH_NAME == 'master') {
@@ -11,12 +12,8 @@ class MavenUtilities implements Serializable {
         }
     }
 
-    def execute(String goals, String stage='build') {
-        steps.stage(stage) {
-            steps.configFileProvider([steps.configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
-                steps.sh "mvn --settings $MAVEN_SETTINGS --batch-mode ${goals}"
-            }
-        }
+    def execute(String goals, String stage = 'build') {
+        steps.sh "mvn --settings ${this.settings} --batch-mode ${goals}"
     }
 }
 
