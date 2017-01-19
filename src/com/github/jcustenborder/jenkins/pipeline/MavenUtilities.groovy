@@ -27,7 +27,7 @@ class MavenUtilities implements Serializable {
 
         commandLine << " ${goals}"
 
-        steps.sh commandLine
+        steps.sh commandLine.toString()
     }
 }
 
