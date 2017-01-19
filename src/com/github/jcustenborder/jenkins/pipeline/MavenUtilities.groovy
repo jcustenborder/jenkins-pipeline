@@ -11,7 +11,23 @@ class MavenUtilities implements Serializable {
     }
 
     def changeVersion(String version) {
-        steps.sh "mvn --batch-mode versions:set -DgenerateBackupPoms=false -DnewVersion=${version}"
+        if (!shouldChangeVersion()) {
+            return
+        }
+
+        pom = steps.readMavenPom file: 'pom.xml'
+        def oldVersion = pom.version
+        def matcher = (pom.version =~ /-SNAPSHOT$/)
+
+        if (!matcher.find()) {
+            return
+        }
+
+        pom.version = matcher.replaceFirst(".${version}")
+
+        steps.echo "Changed pom version from ${oldVersion} to ${pom.version}"
+
+        writeMavenPom model: pom
     }
 
     def execute(String goals, String profiles = null) {
@@ -21,7 +37,7 @@ class MavenUtilities implements Serializable {
             commandLine << " --settings ${this.settings}"
         }
 
-        if (null != this.profiles) {
+        if (null != profiles) {
             commandLine << " -P ${profiles}"
         }
 
