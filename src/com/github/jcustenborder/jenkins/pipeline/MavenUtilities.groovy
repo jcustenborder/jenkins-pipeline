@@ -14,7 +14,7 @@ class MavenUtilities implements Serializable {
     def execute(String goals, String stage='build') {
         steps.stage(stage) {
             steps.configFileProvider([steps.configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
-                steps.sh "mvn --settings ${MAVEN_SETTINGS} --batch-mode ${goals}"
+                steps.sh "mvn --settings $MAVEN_SETTINGS --batch-mode ${goals}"
             }
         }
     }
