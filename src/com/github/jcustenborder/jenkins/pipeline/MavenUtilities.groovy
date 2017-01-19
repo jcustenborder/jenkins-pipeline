@@ -5,7 +5,7 @@ class MavenUtilities implements Serializable {
 
     MavenUtilities(steps) { this.steps = steps; }
 
-    def changeVersion(SString version) {
+    def changeVersion(String version) {
         if (env.BRANCH_NAME == 'master') {
             steps.sh "mvn --batch-mode versions:set -DgenerateBackupPoms=false -DnewVersion=${version}"
         }
