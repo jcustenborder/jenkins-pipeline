@@ -14,8 +14,20 @@ class MavenUtilities implements Serializable {
         steps.sh "mvn --batch-mode versions:set -DgenerateBackupPoms=false -DnewVersion=${version}"
     }
 
-    def execute(String goals) {
-        steps.sh "mvn --settings ${this.settings} --batch-mode ${goals}"
+    def execute(String goals, String profiles = null) {
+        def commandLine = 'mvn -B' << ''
+
+        if (null != this.settings) {
+            commandLine << " --settings ${this.settings}"
+        }
+
+        if (null != this.settings) {
+            commandLine << " -P ${profiles}"
+        }
+
+        commandLine << " ${goals}"
+
+        steps.sh commandLine
     }
 }
 
