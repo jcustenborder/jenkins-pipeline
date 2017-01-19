@@ -6,13 +6,15 @@ class MavenUtilities implements Serializable {
 
     MavenUtilities(steps, settings) { this.steps = steps; this.settings = settings }
 
-    def changeVersion(String version) {
-        if (env.BRANCH_NAME == 'master') {
-            steps.sh "mvn --batch-mode versions:set -DgenerateBackupPoms=false -DnewVersion=${version}"
-        }
+    def shouldChangeVersion() {
+        return env.BRANCH_NAME == 'master'
     }
 
-    def execute(String goals, String stage = 'build') {
+    def changeVersion(String version) {
+        steps.sh "mvn --batch-mode versions:set -DgenerateBackupPoms=false -DnewVersion=${version}"
+    }
+
+    def execute(String goals) {
         steps.sh "mvn --settings ${this.settings} --batch-mode ${goals}"
     }
 }
