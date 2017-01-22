@@ -12,22 +12,23 @@ class MavenUtilities implements Serializable {
     }
 
     def changeVersion() {
+        def pom = steps.readMavenPom()
+
         if (!shouldChangeVersion()) {
             steps.echo "version changes only on master. Current branch is ${env.BRANCH_NAME}"
-            return
+            return pom.version
         }
-
-        def pom = steps.readMavenPom()
 
         if(!pom.version.endsWith("-SNAPSHOT")) {
             steps.echo "Version '${pom.version}' does end with -SNAPSHOT."
-            return
+            return pom.version
         }
 
         def oldVersion = pom.version
         pom.version = pom.version.replace("-SNAPSHOT", ".${env.BUILD_NUMBER}")
         steps.sh "mvn -B versions:set -DgenerateBackupPoms=false -DnewVersion=${pom.version}"
         steps.echo "Changed version from ${oldVersion} to ${pom.version}"
+        return pom.version
     }
 
     def execute(String goals, String profiles = null) {
