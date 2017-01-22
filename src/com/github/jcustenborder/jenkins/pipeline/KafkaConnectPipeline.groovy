@@ -13,7 +13,6 @@ def execute() {
                 configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
                     def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
                     mvn.changeVersion()
-                    echo "changed pom version to ${newVersion}"
                     mvn.execute('clean package')
                 }
                 junit '**/target/surefire-reports/TEST-*.xml'
