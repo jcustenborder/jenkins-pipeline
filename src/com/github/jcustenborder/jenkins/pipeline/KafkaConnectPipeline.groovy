@@ -12,8 +12,8 @@ def execute() {
             docker.image(images.jdk8_docker_image).inside {
                 configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
                     def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
-                    mvn.changeVersion()
-
+                    def newVersion = mvn.changeVersion()
+                    echo "changed pom version to ${newVersion}"
                     mvn.execute('clean package')
                 }
                 junit '**/target/surefire-reports/TEST-*.xml'

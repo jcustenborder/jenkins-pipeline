@@ -27,9 +27,8 @@ class MavenUtilities implements Serializable {
         }
 
         def newVersion = matcher.replaceFirst(".${env.BUILD_NUMBER}")
-        steps.echo "Changing pom version from ${oldVersion} to ${newVersion}"
         steps.sh "mvn -B versions:set -DgenerateBackupPoms=false -DnewVersion=${newVersion}"
-        steps.echo "Changed pom version from ${oldVersion} to ${newVersion}"
+        return newVersion
     }
 
     def execute(String goals, String profiles = null) {
