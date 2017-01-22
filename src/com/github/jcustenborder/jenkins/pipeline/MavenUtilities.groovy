@@ -10,7 +10,7 @@ class MavenUtilities implements Serializable {
         return env.BRANCH_NAME == 'master'
     }
 
-    def changeVersion(String version) {
+    def changeVersion() {
         if (!shouldChangeVersion()) {
             return
         }
@@ -23,11 +23,9 @@ class MavenUtilities implements Serializable {
             return
         }
 
-        pom.version = matcher.replaceFirst(".${version}")
-
-        steps.echo "Changed pom version from ${oldVersion} to ${pom.version}"
-
-        writeMavenPom model: pom
+        def newVersion = matcher.replaceFirst(".${env.BUILD_NUMBER}")
+        sh "mvn -B versions:set -DgenerateBackupPoms=false -DnewVersion=${newVersion}"
+        steps.echo "Changed pom version from ${oldVersion} to ${newVersion}"
     }
 
     def execute(String goals, String profiles = null) {
