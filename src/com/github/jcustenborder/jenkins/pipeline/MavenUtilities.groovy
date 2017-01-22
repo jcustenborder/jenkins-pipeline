@@ -1,10 +1,11 @@
 package com.github.jcustenborder.jenkins.pipeline
 
 class MavenUtilities implements Serializable {
+    def env
     def steps
-    def settings;
+    def settings
 
-    MavenUtilities(steps, settings) { this.steps = steps; this.settings = settings }
+    MavenUtilities(env, steps, settings) { this.env = env; this.steps = steps; this.settings = settings }
 
     def shouldChangeVersion() {
         return env.BRANCH_NAME == 'master'
