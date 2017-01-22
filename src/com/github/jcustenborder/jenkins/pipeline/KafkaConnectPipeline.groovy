@@ -25,7 +25,7 @@ def createPackage(String name, String type, String version, String description, 
     stash includes: "target/*.${type}", name: type
 }
 
-def createDockerfile(String name, String version, String baseImage='confluentinc/cp-kafka-connect-base:3.1.1-1') {
+def createDockerfile(String name, String version, String baseImage = 'confluentinc/cp-kafka-connect-base:3.1.1-1') {
     def text = "FROM ${baseImage}\n" +
             "ADD ${name}-${version}.tar.gz /\n"
 
@@ -74,26 +74,33 @@ def execute() {
                     createPackage(artifactId, 'deb', version, description, url)
                 }
             }
-        }, 'docker': {
-            node {
-                unstash 'tar'
-                dir('target') {
-                    createDockerfile(artifactId, version)
-                    def image = docker.build("jcustenborder/${artifactId}")
-                    image.push 'latest'
-                    image.push version
-                }
+        }
+    }
+
+    node {
+        unstash 'rpm'
+        unstash 'deb'
+        unstash 'tar'
+        unstash 'Dockerfile'
+
+        def image
+
+        stage('package') {
+            dir('target') {
+                createDockerfile(artifactId, version)
+                image = docker.build("jcustenborder/${artifactId}")
 
             }
         }
 
-        node {
-            unstash 'rpm'
-            unstash 'deb'
-            unstash 'tar'
-            unstash 'Dockerfile'
-            archiveArtifacts "target/${artifactId}-${version}.*"
-            archiveArtifacts 'Dockerfile'
+        archiveArtifacts "target/${artifactId}-${version}.*"
+        archiveArtifacts 'Dockerfile'
+
+        if (env.BRANCH_NAME == 'master') {
+            stage('publish') {
+                image.push 'latest'
+                image.push version
+            }
         }
     }
 }
