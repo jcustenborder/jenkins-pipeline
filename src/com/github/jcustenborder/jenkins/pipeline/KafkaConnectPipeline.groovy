@@ -34,7 +34,7 @@ def execute() {
 
             docker.image('jcustenborder/packaging-centos-7:latest').inside {
                 dir('target') {
-                    sh "/usr/local/bin/fpm --input-type tar --output-type rpm --version ${version} --name ${artifactId} --license 'The Apache License, Version 2.0' --vendor 'Jeremy Custenborder' --architecture all --maintainer jcustenborder@gmail.com --config-files /etc --package ${artifactId}-${version}.rpm ${artifactId}-${version}.tar.gz"
+                    sh "/usr/local/bin/fpm --input-type tar --output-type rpm --version ${version} --name ${artifactId} --license 'The Apache License, Version 2.0' --vendor 'Jeremy Custenborder' --architecture all --maintainer jcustenborder@gmail.com --config-files /etc --package '${pwd()}/${artifactId}-${version}.rpm' '${pwd()}/${artifactId}-${version}.tar.gz'"
                 }
             }
         }
