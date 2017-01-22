@@ -80,7 +80,8 @@ def execute() {
                 dir('target') {
                     createDockerfile(artifactId, version)
                     def image = docker.build("jcustenborder/${artifactId}")
-                    image.push
+                    image.push 'latest'
+                    image.push version
                 }
 
             }
