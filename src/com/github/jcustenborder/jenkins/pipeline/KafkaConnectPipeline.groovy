@@ -5,7 +5,8 @@ properties([
 ])
 
 def createPackage(String name, String type, String version, String description, String url) {
-    outputPath = "${pwd()}/${name}-${version}.${type}"
+    def inputPath = "${pwd()}/target/${name}-${version}.tar.gz"
+    def outputPath = "${pwd()}/target/${name}-${version}.${type}"
 
     sh "/usr/local/bin/fpm --input-type tar " +
             "--output-type ${type} " +
@@ -19,7 +20,7 @@ def createPackage(String name, String type, String version, String description, 
             "--maintainer jcustenborder@gmail.com " +
             "--config-files /etc " +
             "--package '${outputPath}' " +
-            "'${pwd()}/${name}-${version}.tar.gz'"
+            "'${inputPath}'"
     stash includes: outputPath, name: type
 }
 
