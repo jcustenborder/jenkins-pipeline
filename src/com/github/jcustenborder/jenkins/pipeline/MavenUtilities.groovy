@@ -14,6 +14,7 @@ class MavenUtilities implements Serializable {
     @NonCPS
     def changeVersion() {
         if (!shouldChangeVersion()) {
+            steps.echo "version changes only on master. Current branch is ${env.BRANCH_NAME}"
             return
         }
 
