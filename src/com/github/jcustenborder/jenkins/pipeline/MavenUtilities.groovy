@@ -11,6 +11,10 @@ class MavenUtilities implements Serializable {
         return env.BRANCH_NAME == 'master'
     }
 
+    def artifactId() {
+        def pom = steps.readMavenPom().artifactId
+    }
+
     def changeVersion() {
         def pom = steps.readMavenPom()
 
