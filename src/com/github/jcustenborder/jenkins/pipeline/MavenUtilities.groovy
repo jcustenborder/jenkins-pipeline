@@ -11,6 +11,7 @@ class MavenUtilities implements Serializable {
         return env.BRANCH_NAME == 'master'
     }
 
+    @NonCPS
     def changeVersion() {
         if (!shouldChangeVersion()) {
             return
