@@ -12,7 +12,7 @@ class MavenUtilities implements Serializable {
     }
 
     def artifactId() {
-        def pom = steps.readMavenPom().artifactId
+        return steps.readMavenPom().artifactId
     }
 
     def changeVersion() {
