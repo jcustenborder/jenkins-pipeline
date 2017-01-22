@@ -17,6 +17,7 @@ def execute() {
                 }
                 junit '**/target/surefire-reports/TEST-*.xml'
             }
+            archiveArtifacts 'target/*.tar.gz'
         }
     }
 }
