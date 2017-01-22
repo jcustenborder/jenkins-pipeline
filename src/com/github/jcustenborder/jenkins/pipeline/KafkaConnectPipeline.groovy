@@ -89,7 +89,6 @@ def execute() {
             dir('target') {
                 createDockerfile(artifactId, version)
                 image = docker.build("jcustenborder/${artifactId}")
-
             }
         }
 
