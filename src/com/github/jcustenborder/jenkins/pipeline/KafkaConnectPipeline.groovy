@@ -11,8 +11,8 @@ def createPackage(String name, String type, String version, String description, 
             "--output-type ${type} " +
             "--version ${version} " +
             "--name ${name} " +
-            "--url ${url}" +
-            "--description '${description}" +
+            "--url ${url} " +
+            "--description '${description}' " +
             "--license 'The Apache License, Version 2.0' " +
             "--vendor 'Jeremy Custenborder' " +
             "--architecture all " +
