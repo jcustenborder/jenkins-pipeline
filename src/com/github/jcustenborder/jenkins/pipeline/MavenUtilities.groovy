@@ -16,7 +16,7 @@ class MavenUtilities implements Serializable {
             return
         }
 
-        pom = steps.readMavenPom
+        pom = steps.readMavenPom()
         def oldVersion = pom.version
         def matcher = (pom.version =~ /-SNAPSHOT$/)
 
