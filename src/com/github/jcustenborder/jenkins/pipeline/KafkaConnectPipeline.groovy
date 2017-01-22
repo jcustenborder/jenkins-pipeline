@@ -25,6 +25,15 @@ def createPackage(String name, String type, String version, String description, 
     stash includes: "target/*.${type}", name: type
 }
 
+def createDockerfile(String name, String version, String baseImage='confluentinc/cp-kafka-connect-base:3.1.1-1') {
+    def text = "FROM ${baseImage}\n" +
+            "ADD ${name}-${version}.tar.gz /\n"
+
+    writeFile file: 'Dockerfile', text: text
+    stash includes: 'Dockerfile', name: 'Dockerfile'
+}
+
+
 def execute() {
     def version
     def artifactId
@@ -65,12 +74,25 @@ def execute() {
                     createPackage(artifactId, 'deb', version, description, url)
                 }
             }
+        }, 'docker': {
+            node {
+                unstash 'tar'
+                dir('target') {
+                    createDockerfile(artifactId, version)
+                    def image = docker.build("jcustenborder/${artifactId}")
+                    image.push
+                }
+
+            }
         }
+
         node {
             unstash 'rpm'
             unstash 'deb'
             unstash 'tar'
+            unstash 'Dockerfile'
             archiveArtifacts "target/${artifactId}-${version}.*"
+            archiveArtifacts 'Dockerfile'
         }
     }
 }
