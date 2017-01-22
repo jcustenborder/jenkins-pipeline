@@ -11,7 +11,6 @@ class MavenUtilities implements Serializable {
         return env.BRANCH_NAME == 'master'
     }
 
-    @NonCPS
     def changeVersion() {
         if (!shouldChangeVersion()) {
             steps.echo "version changes only on master. Current branch is ${env.BRANCH_NAME}"
@@ -19,16 +18,16 @@ class MavenUtilities implements Serializable {
         }
 
         def pom = steps.readMavenPom()
-        def oldVersion = pom.version
-        def matcher = (pom.version =~ /-SNAPSHOT$/)
 
-        if (!matcher.find()) {
-            steps.echo "didn't match ${pom.version}"
+        if(!pom.version.endsWith("-SNAPSHOT")) {
+            steps.echo "Version '${pom.version}' does end with -SNAPSHOT."
             return
         }
 
-        def newVersion = matcher.replaceFirst(".${env.BUILD_NUMBER}")
-        steps.sh "mvn -B versions:set -DgenerateBackupPoms=false -DnewVersion=${newVersion}"
+        def oldVersion = pom.version
+        pom.version = pom.version.replace("-SNAPSHOT", ".${env.BUILD_NUMBER}")
+        steps.sh "mvn -B versions:set -DgenerateBackupPoms=false -DnewVersion=${pom.version}"
+        steps.echo "Changed version from ${oldVersion} to ${pom.version}"
         return newVersion
     }
 
