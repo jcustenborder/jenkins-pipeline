@@ -21,6 +21,7 @@ def createPackage(String name, String type, String version, String description, 
             "--config-files /etc " +
             "--package '${outputPath}' " +
             "'${inputPath}'"
+    echo "Finished building ${outputPath}"
     stash includes: outputPath, name: type
 }
 
