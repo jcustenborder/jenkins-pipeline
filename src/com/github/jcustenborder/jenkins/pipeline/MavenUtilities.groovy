@@ -23,6 +23,7 @@ class MavenUtilities implements Serializable {
         def matcher = (pom.version =~ /-SNAPSHOT$/)
 
         if (!matcher.find()) {
+            steps.echo "didn't match ${pom.version}"
             return
         }
 
