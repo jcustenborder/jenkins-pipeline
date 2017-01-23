@@ -107,7 +107,8 @@ def execute() {
                             repositoryName: "jcustenborder/${artifactId}",
                             tagName: version,
                             description: 'Testing',
-                            includes: "target/${artifactId}-${version}.*"
+                            includes: "target/${artifactId}-${version}.*",
+                            excludes: '**/*.jar'
                     )
                 }
             }
