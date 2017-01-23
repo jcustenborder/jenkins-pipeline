@@ -106,7 +106,7 @@ def execute() {
                             token: apiToken,
                             repositoryName: "jcustenborder/${artifactId}",
                             tagName: version,
-                            descriptionFile: 'Testing',
+                            description: 'Testing',
                             includes: "target/${artifactId}-${version}.*"
                     )
                 }
