@@ -55,7 +55,7 @@ def execute() {
                 }
                 junit '**/target/surefire-reports/TEST-*.xml'
             }
-            stash includes: 'target/*.tar.*', name: 'tar'
+            stash includes: "target/${artifactId}.${version}.tar.gz", name: 'tar'
         }
     }
 
@@ -104,7 +104,8 @@ def execute() {
                             token: apiToken,
                             repositoryName: 'jcustenborder/kafka-connect-simulator',
                             tagName: version,
-                            description: 'This is a test description'
+                            description: 'This is a test description',
+                            includes: "target/${artifactId}.${version}.{tar.gz,rpm,deb}"
                     )
                 }
             }
