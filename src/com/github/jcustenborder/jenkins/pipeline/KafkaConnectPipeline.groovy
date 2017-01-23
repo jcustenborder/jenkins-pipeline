@@ -84,7 +84,7 @@ def execute() {
 
         def image
 
-        stage('package') {
+        stage('docker') {
             dir('target') {
                 createDockerfile(artifactId, version)
                 image = docker.build("jcustenborder/${artifactId}")
@@ -102,7 +102,7 @@ def execute() {
                 withCredentials([string(credentialsId: 'github_api_token', variable: 'apiToken')]) {
                     githubRelease(
                             token: apiToken,
-                            repositoryName: 'jcustenborder/kafka-connect-simulator',
+                            repositoryName: "jcustenborder/${artifactId}",
                             tagName: version,
                             description: 'This is a test description',
                             includes: "target/${artifactId}-${version}.{tar.gz,rpm,deb}"
