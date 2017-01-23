@@ -81,7 +81,6 @@ def execute() {
         unstash 'rpm'
         unstash 'deb'
         unstash 'tar'
-        unstash 'Dockerfile'
 
         def image
 
