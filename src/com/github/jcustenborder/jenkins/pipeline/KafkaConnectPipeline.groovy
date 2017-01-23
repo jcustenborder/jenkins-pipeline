@@ -103,7 +103,7 @@ def execute() {
                     githubRelease(
                             token: apiToken,
                             repositoryName: 'jcustenborder/kafka-connect-simulator',
-                            version: version,
+                            tagName: version,
                             description: 'This is a test description'
                     )
                 }
