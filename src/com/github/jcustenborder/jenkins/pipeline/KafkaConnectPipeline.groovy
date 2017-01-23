@@ -22,7 +22,7 @@ def createPackage(String name, String type, String version, String description, 
             "--package '${outputPath}' " +
             "'${inputPath}'"
     echo "Finished building ${outputPath}, stashing ${outputPath}"
-    stash includes: "target/*.${type}", name: type
+    stash includes: outputPath, name: type
 }
 
 def createDockerfile(String name, String version, String baseImage = 'confluentinc/cp-kafka-connect-base:3.1.1-1') {
@@ -55,7 +55,7 @@ def execute() {
                 }
                 junit '**/target/surefire-reports/TEST-*.xml'
             }
-            stash includes: "target/${artifactId}.${version}.tar.gz", name: 'tar'
+            stash includes: "target/${artifactId}-${version}.tar.gz", name: 'tar'
         }
     }
 
@@ -105,7 +105,7 @@ def execute() {
                             repositoryName: 'jcustenborder/kafka-connect-simulator',
                             tagName: version,
                             description: 'This is a test description',
-                            includes: "target/${artifactId}.${version}.{tar.gz,rpm,deb}"
+                            includes: "target/${artifactId}-${version}.{tar.gz,rpm,deb}"
                     )
                 }
             }
