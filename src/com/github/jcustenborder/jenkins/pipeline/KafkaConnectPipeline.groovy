@@ -22,7 +22,7 @@ def createPackage(String name, String type, String version, String description, 
             "--package '${outputPath}' " +
             "'${inputPath}'"
     echo "Finished building ${outputPath}, stashing ${outputPath}"
-    stash includes: outputPath, name: type
+    stash includes: "target/*.${type}", name: type
 }
 
 def createDockerfile(String name, String version, String baseImage = 'confluentinc/cp-kafka-connect-base:3.1.1-1') {
