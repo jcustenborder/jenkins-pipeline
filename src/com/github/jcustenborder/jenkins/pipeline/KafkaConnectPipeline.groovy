@@ -95,7 +95,6 @@ def execute() {
         }
 
         archiveArtifacts "target/${artifactId}-${version}.*"
-
         if (env.BRANCH_NAME == 'master') {
             stage('publish') {
                 image.push 'latest'
@@ -110,8 +109,8 @@ def execute() {
                                 repositoryName: "jcustenborder/${artifactId}",
                                 tagName: version,
                                 description: 'Testing',
-                                includes: "**",
-                                excludes: '**/*.jar'
+                                includes: "*.*",
+                                excludes: '*.jar'
                         )
                     }
                 }
