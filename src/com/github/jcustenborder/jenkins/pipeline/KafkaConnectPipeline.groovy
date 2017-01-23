@@ -104,7 +104,7 @@ def execute() {
 
                 withCredentials([string(credentialsId: 'github_api_token', variable: 'apiToken')]) {
                     dir('target') {
-                        sh 'ls -1 *'
+                        sh "ls -1 ${pwd()}"
                         githubRelease(
                                 token: apiToken,
                                 repositoryName: "jcustenborder/${artifactId}",
