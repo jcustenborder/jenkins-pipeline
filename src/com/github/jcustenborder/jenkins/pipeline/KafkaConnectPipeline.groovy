@@ -97,8 +97,17 @@ def execute() {
             stage('publish') {
                 image.push 'latest'
                 image.push version
+                archiveArtifacts 'target/Dockerfile'
+
+                withCredentials([string(credentialsId: 'github_api_token', variable: 'apiToken')]) {
+                    githubRelease(
+                            token: apiToken,
+                            repositoryName: 'jcustenborder/kafka-connect-simulator',
+                            version: version,
+                            description: 'This is a test description'
+                    )
+                }
             }
-            archiveArtifacts 'target/Dockerfile'
         }
     }
 }
