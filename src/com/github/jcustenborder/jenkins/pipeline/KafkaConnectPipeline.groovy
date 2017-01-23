@@ -56,6 +56,7 @@ def execute() {
                 junit '**/target/surefire-reports/TEST-*.xml'
             }
             stash includes: "target/${artifactId}-${version}.tar.gz", name: 'tar'
+            stash includes: "target/CHANGELOG.md", name: 'changelog'
         }
     }
 
@@ -81,6 +82,7 @@ def execute() {
         unstash 'rpm'
         unstash 'deb'
         unstash 'tar'
+        unstash 'changelog'
 
         def image
 
@@ -104,7 +106,7 @@ def execute() {
                             token: apiToken,
                             repositoryName: "jcustenborder/${artifactId}",
                             tagName: version,
-                            description: 'This is a test description',
+                            descriptionFile: 'target/CHANGELOG.md',
                             includes: "target/${artifactId}-${version}.*"
                     )
                 }
