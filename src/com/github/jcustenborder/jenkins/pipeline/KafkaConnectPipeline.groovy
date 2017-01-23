@@ -102,14 +102,16 @@ def execute() {
                 archiveArtifacts 'target/Dockerfile'
 
                 withCredentials([string(credentialsId: 'github_api_token', variable: 'apiToken')]) {
-                    githubRelease(
-                            token: apiToken,
-                            repositoryName: "jcustenborder/${artifactId}",
-                            tagName: version,
-                            description: 'Testing',
-                            includes: "target/${artifactId}-${version}.*",
-                            excludes: '**/*.jar'
-                    )
+                    dir('target') {
+                        githubRelease(
+                                token: apiToken,
+                                repositoryName: "jcustenborder/${artifactId}",
+                                tagName: version,
+                                description: 'Testing',
+                                includes: "${artifactId}-${version}.*",
+                                excludes: '**/*.jar'
+                        )
+                    }
                 }
             }
         }
