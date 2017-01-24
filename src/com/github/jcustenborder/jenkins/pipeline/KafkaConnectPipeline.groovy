@@ -53,9 +53,13 @@ def execute() {
                     artifactId = mvn.artifactId()
                     description = mvn.description();
                     url = mvn.url()
-                    mvn.execute('clean package')
+                    try {
+                        mvn.execute('clean package')
+                    }
+                    finally {
+                        junit '**/target/surefire-reports/TEST-*.xml'
+                    }
                 }
-                junit '**/target/surefire-reports/TEST-*.xml'
             }
             stash includes: "target/${artifactId}-${version}.tar.gz", name: 'tar'
             stash includes: 'target/CHANGELOG.md', name: 'changelog'
