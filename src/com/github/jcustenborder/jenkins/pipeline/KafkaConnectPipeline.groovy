@@ -84,7 +84,7 @@ def execute() {
         unstash 'rpm'
         unstash 'deb'
         unstash 'tar'
-//        unstash 'changelog'
+        unstash 'changelog'
 
         def image
 
