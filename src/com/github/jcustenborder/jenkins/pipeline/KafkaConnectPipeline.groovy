@@ -43,6 +43,7 @@ def execute() {
 
     stage('build') {
         node {
+            deleteDir()
             checkout scm
 
             docker.image(images.jdk8_docker_image).inside {
@@ -57,7 +58,7 @@ def execute() {
                 junit '**/target/surefire-reports/TEST-*.xml'
             }
             stash includes: "target/${artifactId}-${version}.tar.gz", name: 'tar'
-//            stash includes: "target/CHANGELOG.md", name: 'changelog'
+            stash includes: 'target/CHANGELOG.md', name: 'changelog'
         }
     }
 
@@ -102,17 +103,14 @@ def execute() {
                 archiveArtifacts 'target/Dockerfile'
 
                 withCredentials([string(credentialsId: 'github_api_token', variable: 'apiToken')]) {
-                    dir('target') {
-                        sh "ls -1 ${pwd()}"
-                        githubRelease(
-                                token: apiToken,
-                                repositoryName: "jcustenborder/${artifactId}",
-                                tagName: version,
-                                description: 'Testing',
-                                includes: "*.*",
-                                excludes: '*.jar'
-                        )
-                    }
+                    githubRelease(
+                            token: apiToken,
+                            repositoryName: "jcustenborder/${artifactId}",
+                            tagName: version,
+                            descriptionFile: 'target/CHANGELOG.md',
+                            includes: "target/${artifactId}-${version}.*",
+                            excludes: '*.jar'
+                    )
                 }
             }
         }
