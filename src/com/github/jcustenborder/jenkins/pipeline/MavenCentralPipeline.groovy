@@ -31,7 +31,6 @@ def execute() {
                     }
                 }
             }
-            stash includes: "target/${artifactId}-${version}.tar.gz", name: 'tar'
         }
     }
 }
