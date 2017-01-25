@@ -3,9 +3,17 @@ package com.github.jcustenborder.jenkins.pipeline
 class MavenUtilities implements Serializable {
     def env
     def steps
-    def settings
+    def settingsPath
+    String pubringPath
+    String secringPath
 
-    MavenUtilities(env, steps, settings) { this.env = env; this.steps = steps; this.settings = settings }
+    MavenUtilities(env, steps, String settingsPath, String pubringPath = null, String secringPath = null) {
+        this.env = env
+        this.steps = steps
+        this.settingsPath = settingsPath
+        this.pubringPath = pubringPath;
+        this.secringPath = secringPath
+    }
 
     def shouldChangeVersion() {
         return env.BRANCH_NAME == 'master'
@@ -31,14 +39,14 @@ class MavenUtilities implements Serializable {
             return pom.version
         }
 
-        if(!pom.version.endsWith("-SNAPSHOT")) {
+        if (!pom.version.endsWith("-SNAPSHOT")) {
             steps.echo "Version '${pom.version}' does end with -SNAPSHOT."
             return pom.version
         }
 
         def oldVersion = pom.version
         pom.version = pom.version.replace("-SNAPSHOT", ".${env.BUILD_NUMBER}")
-        steps.sh "mvn -B versions:set -DgenerateBackupPoms=false -DnewVersion=${pom.version}"
+        steps.sh "mvn -B --settings ${this.settingsPath} versions:set -DgenerateBackupPoms=false -DnewVersion=${pom.version}"
         steps.echo "Changed version from ${oldVersion} to ${pom.version}"
         return pom.version
     }
@@ -46,8 +54,8 @@ class MavenUtilities implements Serializable {
     def execute(String goals, String profiles = null) {
         def commandLine = 'mvn -B' << ''
 
-        if (null != this.settings) {
-            commandLine << " --settings ${this.settings}"
+        if (null != this.settingsPath) {
+            commandLine << " --settings ${this.settingsPath}"
         }
 
         if (null != profiles) {
