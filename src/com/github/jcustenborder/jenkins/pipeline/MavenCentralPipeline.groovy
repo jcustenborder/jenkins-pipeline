@@ -25,7 +25,7 @@ def execute() {
                     description = mvn.description();
                     url = mvn.url()
                     try {
-                        mvn.execute('clean package')
+                        mvn.execute('clean package', 'gpg-signing,maven-central')
                     } finally {
                         junit '**/target/surefire-reports/TEST-*.xml'
                     }
