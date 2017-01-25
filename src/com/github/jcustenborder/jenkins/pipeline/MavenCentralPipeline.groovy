@@ -23,9 +23,21 @@ def execute() {
                     version = mvn.changeVersion()
                     artifactId = mvn.artifactId()
                     description = mvn.description();
+
+                    def goals
+                    def profiles = null
+
+                    if(env.BRANCH_NAME == 'master'||env.BRANCH_NAME == 'package-refactor') {
+                        goals = 'clean deploy'
+                        profiles = 'gpg-signing,maven-central'
+                    } else {
+                        goals = 'clean package'
+                    }
+
+
                     url = mvn.url()
                     try {
-                        mvn.execute('clean package', 'gpg-signing,maven-central')
+                        mvn.execute(goals, profiles)
                     } finally {
                         junit '**/target/surefire-reports/TEST-*.xml'
                     }
