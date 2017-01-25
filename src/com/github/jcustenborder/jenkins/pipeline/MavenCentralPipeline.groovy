@@ -28,7 +28,7 @@ def execute() {
                         def goals
                         def profiles = null
 
-                        if (env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'package-refactor') {
+                        if (env.BRANCH_NAME == 'master') {
                             goals = 'clean deploy'
                             profiles = 'gpg-signing,maven-central'
                         } else {
