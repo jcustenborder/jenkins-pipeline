@@ -57,7 +57,7 @@ def execute() {
                         mvn.execute('clean package')
                     }
                     finally {
-                        junit '**/target/surefire-reports/TEST-*.xml'
+                        junit allowEmptyResults: true, testResults: '**/target/surefire-reports/TEST-*.xml'
                     }
                 }
             }
