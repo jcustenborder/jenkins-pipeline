@@ -63,6 +63,7 @@ def execute() {
             }
             stash includes: "target/${artifactId}-${version}.tar.gz", name: 'tar'
             stash includes: 'target/CHANGELOG.md', name: 'changelog'
+            stash includes: 'target/docs/**/*', 'docs'
         }
     }
 
@@ -89,6 +90,7 @@ def execute() {
         unstash 'deb'
         unstash 'tar'
         unstash 'changelog'
+        unstash 'docs'
 
         def image
 
@@ -100,6 +102,8 @@ def execute() {
         }
 
         archiveArtifacts "target/${artifactId}-${version}.*"
+        archiveArtifacts "docs/**/*"
+
         if (env.BRANCH_NAME == 'master') {
             stage('publish') {
                 image.push 'latest'
