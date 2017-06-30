@@ -63,7 +63,7 @@ def execute() {
             }
             stash includes: "target/${artifactId}-${version}.tar.gz", name: 'tar'
             stash includes: 'target/CHANGELOG.md', name: 'changelog'
-            stash includes: 'target/docs/**/*', name: 'docs'
+            stash includes: 'target/docs/**/**', name: 'docs'
         }
     }
 
@@ -102,7 +102,7 @@ def execute() {
         }
 
         archiveArtifacts "target/${artifactId}-${version}.*"
-        archiveArtifacts "docs/**/*"
+        archiveArtifacts "target/docs/**/*"
 
         if (env.BRANCH_NAME == 'master') {
             stage('publish') {
