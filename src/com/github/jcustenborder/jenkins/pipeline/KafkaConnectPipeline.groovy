@@ -8,6 +8,10 @@ def createPackage(String name, String type, String version, String description, 
     def inputPath = "${pwd()}/target/${name}-${version}.tar.gz"
     def outputPath = "${pwd()}/target/${name}-${version}.${type}"
 
+    if(fileExists(outputPath)) {
+        sh "rm '${outputPath}'"
+    }
+
     sh "/usr/local/bin/fpm --input-type tar " +
             "--output-type ${type} " +
             "--version ${version} " +
