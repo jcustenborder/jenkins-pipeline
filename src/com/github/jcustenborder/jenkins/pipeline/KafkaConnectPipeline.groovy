@@ -63,7 +63,7 @@ def execute() {
             }
             stash includes: "target/${artifactId}-${version}.tar.gz", name: 'tar'
             stash includes: 'target/CHANGELOG.md', name: 'changelog'
-            stash includes: 'target/docs/**/*', 'docs'
+            stash includes: 'target/docs/**/*', name: 'docs'
         }
     }
 
