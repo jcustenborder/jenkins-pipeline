@@ -25,7 +25,7 @@ def createPackage(String name, String type, String version, String description, 
     stash includes: "target/*.${type}", name: type
 }
 
-def createDockerfile(String name, String version, String baseImage = 'confluentinc/cp-kafka-connect:3.1.1-1') {
+def createDockerfile(String name, String version, String baseImage = 'confluentinc/cp-kafka-connect:3.2.2-1') {
     def text = "FROM ${baseImage}\n" +
             "MAINTAINER jcustenborder@gmail.com\n" +
             "ADD ${name}-${version}.tar.gz /\n"
