@@ -103,8 +103,6 @@ def execute() {
 
         if (env.BRANCH_NAME == 'master') {
             stage('publish') {
-                archiveArtifacts 'target/Dockerfile'
-
                 withCredentials([string(credentialsId: 'github_api_token', variable: 'apiToken')]) {
                     githubRelease(
                             token: apiToken,
