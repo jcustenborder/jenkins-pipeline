@@ -98,12 +98,12 @@ def execute() {
 
         def image
 
-        stage('docker') {
-            dir('target') {
-                createDockerfile(artifactId, version)
-                image = docker.build("jcustenborder/${artifactId}")
-            }
-        }
+#        stage('docker') {
+#            dir('target') {
+#                createDockerfile(artifactId, version)
+#                image = docker.build("jcustenborder/${artifactId}")
+#            }
+#        }
 
         archiveArtifacts "target/${artifactId}-${version}.*"
         archiveArtifacts "target/docs/**/*"
