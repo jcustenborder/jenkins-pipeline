@@ -103,8 +103,6 @@ def execute() {
 
         if (env.BRANCH_NAME == 'master') {
             stage('publish') {
-                image.push 'latest'
-                image.push version
                 archiveArtifacts 'target/Dockerfile'
 
                 withCredentials([string(credentialsId: 'github_api_token', variable: 'apiToken')]) {
