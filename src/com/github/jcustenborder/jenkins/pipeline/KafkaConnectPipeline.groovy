@@ -112,7 +112,7 @@ def execute() {
                             tagName: version,
                             descriptionFile: 'target/CHANGELOG.md',
                             includes: "target/${artifactId}-${version}.*",
-                            excludes: '*.jar'
+                            excludes: 'target/*.jar'
                     )
                 }
             }
