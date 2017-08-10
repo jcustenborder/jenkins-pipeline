@@ -75,14 +75,14 @@ def execute() {
         parallel 'rpm': {
             node {
                 unstash 'tar'
-                docker.image('jcustenborder/packaging-centos-7:latest').inside {
+                docker.image(images.jdk8_docker_image).inside {
                     createPackage(artifactId, 'rpm', version, description, url)
                 }
             }
         }, 'deb': {
             node {
                 unstash 'tar'
-                docker.image('jcustenborder/packaging-centos-7:latest').inside {
+                docker.image(images.jdk8_docker_image).inside {
                     createPackage(artifactId, 'deb', version, description, url)
                 }
             }
