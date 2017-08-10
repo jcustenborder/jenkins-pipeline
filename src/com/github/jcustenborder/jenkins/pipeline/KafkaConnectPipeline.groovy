@@ -4,9 +4,7 @@ properties([
         buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '10'))
 ])
 
-environment {
-    DOCKER_HOST = 'unix:///var/run/docker.sock'
-}
+
 
 def createPackage(String name, String type, String version, String description, String url) {
     def inputPath = "${pwd()}/target/${name}-${version}.tar.gz"
@@ -49,13 +47,17 @@ def execute() {
     def description
     def url
 
+    environment {
+        DOCKER_HOST = 'unix:///var/run/docker.sock'
+    }
+
     stage('build') {
         node {
             deleteDir()
             checkout scm
 
             docker.image(images.jdk8_docker_image).inside('-v /var/run/docker.sock:/var/run/docker.sock') {
-                sh 'echo "DOCKER_HOST = ${DOCKER_HOST}"'
+                sh 'echo DOCKER_HOST = $DOCKER_HOST'
 
                 configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
                     def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
