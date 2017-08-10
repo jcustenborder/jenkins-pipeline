@@ -47,29 +47,27 @@ def execute() {
     def description
     def url
 
-    environment {
-        DOCKER_HOST = 'unix:///var/run/docker.sock'
-    }
-
     stage('build') {
         node {
             deleteDir()
             checkout scm
 
             docker.image(images.jdk8_docker_image).inside('-v /var/run/docker.sock:/var/run/docker.sock') {
-                sh 'echo DOCKER_HOST = $DOCKER_HOST'
+                withEnv(['DOCKER_HOST=unix:///var/run/docker.sock']) {
+                    sh 'echo DOCKER_HOST = $DOCKER_HOST'
 
-                configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
-                    def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
-                    version = mvn.changeVersion()
-                    artifactId = mvn.artifactId()
-                    description = mvn.description();
-                    url = mvn.url()
-                    try {
-                        mvn.execute('clean package')
-                    }
-                    finally {
-                        junit allowEmptyResults: true, testResults: '**/target/surefire-reports/TEST-*.xml'
+                    configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
+                        def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
+                        version = mvn.changeVersion()
+                        artifactId = mvn.artifactId()
+                        description = mvn.description();
+                        url = mvn.url()
+                        try {
+                            mvn.execute('clean package')
+                        }
+                        finally {
+                            junit allowEmptyResults: true, testResults: '**/target/surefire-reports/TEST-*.xml'
+                        }
                     }
                 }
             }
