@@ -50,7 +50,7 @@ def execute() {
             deleteDir()
             checkout scm
 
-            docker.image(images.jdk8_docker_image).inside('-v /var/run/docker.sock:/var/run/docker.sock') {
+            docker.image(images.jdk8_docker_image).inside('-v /var/run/docker.sock:/var/run/docker.sock -e DOCKER_HOST=unix:///var/run/docker.sock') {
                 configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
                     def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
                     version = mvn.changeVersion()
