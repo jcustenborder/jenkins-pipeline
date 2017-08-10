@@ -5,12 +5,11 @@ properties([
 ])
 
 
-
 def createPackage(String name, String type, String version, String description, String url) {
     def inputPath = "${pwd()}/target/${name}-${version}.tar.gz"
     def outputPath = "${pwd()}/target/${name}-${version}.${type}"
 
-    if(fileExists(outputPath)) {
+    if (fileExists(outputPath)) {
         sh "rm '${outputPath}'"
     }
 
@@ -52,26 +51,18 @@ def execute() {
             deleteDir()
             checkout scm
 
-            docker.image(images.jdk8_docker_image).inside('-v /var/run/docker.sock:/var/run/docker.sock') {
-                withEnv(['DOCKER_HOST=unix:///var/run/docker.sock']) {
-                    sh 'echo DOCKER_HOST = $DOCKER_HOST'
-                    sh 'whoami'
-                    sh 'groups'
-                    sh 'ls -lart /var/run/docker.sock'
-                    sh 'ls -lart'
-
-                    configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
-                        def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
-                        version = mvn.changeVersion()
-                        artifactId = mvn.artifactId()
-                        description = mvn.description();
-                        url = mvn.url()
-                        try {
-                            mvn.execute('clean package')
-                        }
-                        finally {
-                            junit allowEmptyResults: true, testResults: '**/target/surefire-reports/TEST-*.xml'
-                        }
+            docker.image(images.jdk8_docker_image).inside('-v /var/run/docker.sock:/var/run/docker.sock --group-add docker') {
+                configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
+                    def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
+                    version = mvn.changeVersion()
+                    artifactId = mvn.artifactId()
+                    description = mvn.description();
+                    url = mvn.url()
+                    try {
+                        mvn.execute('clean package')
+                    }
+                    finally {
+                        junit allowEmptyResults: true, testResults: '**/target/surefire-reports/TEST-*.xml'
                     }
                 }
             }
