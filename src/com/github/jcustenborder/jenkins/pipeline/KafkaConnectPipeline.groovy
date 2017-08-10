@@ -50,7 +50,7 @@ def execute() {
             deleteDir()
             checkout scm
 
-            docker.image(images.jdk8_docker_image).inside {
+            docker.image(images.jdk8_docker_image).inside('-v /var/run/docker.sock:/var/run/docker.sock') {
                 configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
                     def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
                     version = mvn.changeVersion()
@@ -113,7 +113,7 @@ def execute() {
                             excludes: 'target/*.jar'
                     )
                 }
-                docker.image(images.jdk8_docker_image).inside('-v /var/run/docker.sock:/var/run/docker.sock') {
+                docker.image(images.jdk8_docker_image).inside {
                     withCredentials([file(credentialsId: 'gpg_pubring', variable: 'GPG_PUBRING'), file(credentialsId: 'gpg_secring', variable: 'GPG_SECRING')]) {
                         configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
                             if (env.BRANCH_NAME == 'master') {
