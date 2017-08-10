@@ -55,6 +55,13 @@ def execute() {
             docker.image(images.jdk8_docker_image).inside('-v /var/run/docker.sock:/var/run/docker.sock') {
                 withEnv(['DOCKER_HOST=unix:///var/run/docker.sock']) {
                     sh 'echo DOCKER_HOST = $DOCKER_HOST'
+                    sh 'whoami'
+                    sh 'groups'
+                    sh 'ls -lart /var/run/docker.sock'
+                    sh 'ls -lart /var/run/docker/'
+                    sh 'ls -lart'
+
+
 
                     configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
                         def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
