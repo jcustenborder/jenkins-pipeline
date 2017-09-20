@@ -5,7 +5,7 @@ properties([
 ])
 
 triggers {
-  upstream(upstreamProjects: "connect-utils/job/master", threshold: hudson.model.Result.SUCCESS)
+  upstream(upstreamProjects: "jcustenborder/connect-utils/job/master", threshold: hudson.model.Result.SUCCESS)
 }
 
 def createPackage(String name, String type, String version, String description, String url) {
