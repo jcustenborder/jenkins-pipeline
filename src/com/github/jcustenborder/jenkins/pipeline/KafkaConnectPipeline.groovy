@@ -4,6 +4,9 @@ properties([
         buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '10'))
 ])
 
+triggers {
+  upstream(upstreamProjects: "connect-utils/job/master", threshold: hudson.model.Result.SUCCESS)
+}
 
 def createPackage(String name, String type, String version, String description, String url) {
     def inputPath = "${pwd()}/target/${name}-${version}.tar.gz"
