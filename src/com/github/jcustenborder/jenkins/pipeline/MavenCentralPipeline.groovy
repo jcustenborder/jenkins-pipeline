@@ -38,7 +38,9 @@ def execute() {
 
                         url = mvn.url()
                         try {
-                            mvn.execute(goals, profiles)
+                            withEnv(["JAVA_HOME=${images.jdk8_java_home}"]) {
+                                mvn.execute(goals, profiles)
+                            }
                         } finally {
                             junit allowEmptyResults: true, testResults: '**/target/surefire-reports/TEST-*.xml'
                         }
