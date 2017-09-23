@@ -52,7 +52,7 @@ class MavenUtilities implements Serializable {
     }
 
     def execute(String goals, String profiles = null) {
-        def commandLine = 'mvn -B' << ''
+        def commandLine = 'mvn -B -DjavadocExecutable=/etc/alternatives/java_sdk_1.8.0/bin/javadoc' << ''
 
         if (null != this.pubringPath) {
             commandLine << " -Dgpg.publicKeyring=${this.pubringPath}"
