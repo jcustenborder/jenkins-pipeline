@@ -97,10 +97,12 @@ def execute() {
                 }
                 echo "Stashing target/${artifactId}-${version}.tar.gz"
                 stash includes: "target/${artifactId}-${version}.tar.gz", name: 'tar'
-                echo 'Stashing target/CHANGELOG.md'
-                stash includes: 'target/CHANGELOG.md', name: 'changelog'
                 echo 'Stashing target/docs/**/**'
                 stash includes: 'target/docs/**/**', name: 'docs'
+                if (env.BRANCH_NAME == 'master') {
+                    echo 'Stashing target/CHANGELOG.md'
+                    stash includes: 'target/CHANGELOG.md', name: 'changelog'
+                }
             }
         }
     }
