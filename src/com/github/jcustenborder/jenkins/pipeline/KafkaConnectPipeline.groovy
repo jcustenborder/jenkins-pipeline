@@ -50,11 +50,10 @@ def execute() {
     def url
 
     node {
-        stage('build') {
-            deleteDir()
-            checkout scm
-
-            docker.image(images.jdk8_docker_image).inside {
+        docker.image(images.jdk8_docker_image).inside {
+            stage('build') {
+                deleteDir()
+                checkout scm
                 configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
                     withEnv(["JAVA_HOME=${images.jdk8_java_home}"]) {
                         def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
@@ -71,32 +70,32 @@ def execute() {
                     }
                 }
             }
-        }
 
-        stage('integration-test') {
-            configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
-                withEnv(["JAVA_HOME=${images.jdk8_java_home}"]) {
-                    def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
-                    try {
-                        mvn.execute('integration-test')
-                    }
-                    finally {
-                        junit allowEmptyResults: true, testResults: '**/target/surefire-reports/TEST-*.xml'
+            stage('integration-test') {
+                configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
+                    withEnv(["JAVA_HOME=${images.jdk8_java_home}"]) {
+                        def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
+                        try {
+                            mvn.execute('integration-test')
+                        }
+                        finally {
+                            junit allowEmptyResults: true, testResults: '**/target/surefire-reports/TEST-*.xml'
+                        }
                     }
                 }
             }
-        }
 
-        stage('package') {
-            configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
-                withEnv(["JAVA_HOME=${images.jdk8_java_home}"]) {
-                    def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
-                    mvn.execute('package')
+            stage('package') {
+                configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
+                    withEnv(["JAVA_HOME=${images.jdk8_java_home}"]) {
+                        def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
+                        mvn.execute('package')
+                    }
                 }
+                stash includes: "target/${artifactId}-${version}.tar.gz", name: 'tar'
+                stash includes: 'target/CHANGELOG.md', name: 'changelog'
+                stash includes: 'target/docs/**/**', name: 'docs'
             }
-            stash includes: "target/${artifactId}-${version}.tar.gz", name: 'tar'
-            stash includes: 'target/CHANGELOG.md', name: 'changelog'
-            stash includes: 'target/docs/**/**', name: 'docs'
         }
     }
 
