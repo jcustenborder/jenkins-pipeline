@@ -50,10 +50,13 @@ def execute() {
     def url
 
     node {
+        stage('checkout') {
+            deleteDir()
+            checkout scm
+        }
+
         docker.image(images.jdk8_docker_image).inside {
             stage('build') {
-                deleteDir()
-                checkout scm
                 configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
                     withEnv(["JAVA_HOME=${images.jdk8_java_home}"]) {
                         def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
