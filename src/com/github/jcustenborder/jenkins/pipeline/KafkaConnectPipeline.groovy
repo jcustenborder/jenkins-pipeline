@@ -88,7 +88,7 @@ def execute() {
                 }
             }
 
-            stage('package') {
+            stage('maven package') {
                 configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
                     withEnv(["JAVA_HOME=${images.jdk8_java_home}"]) {
                         def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
@@ -102,7 +102,7 @@ def execute() {
         }
     }
 
-    stage('package') {
+    stage('os packages') {
         parallel 'rpm': {
             node {
                 unstash 'tar'
