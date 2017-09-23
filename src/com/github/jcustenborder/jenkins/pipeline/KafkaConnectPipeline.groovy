@@ -5,7 +5,7 @@ properties([
 ])
 
 triggers {
-  upstream(upstreamProjects: "jcustenborder/connect-utils/job/master", threshold: hudson.model.Result.SUCCESS)
+    upstream(upstreamProjects: "jcustenborder/connect-utils/job/master", threshold: hudson.model.Result.SUCCESS)
 }
 
 def createPackage(String name, String type, String version, String description, String url) {
@@ -56,13 +56,29 @@ def execute() {
 
             docker.image(images.jdk8_docker_image).inside {
                 configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
+                    withEnv(['JAVA_HOME=/etc/alternatives/java_sdk_1.8.0']) {
+                        def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
+                        version = mvn.changeVersion()
+                        artifactId = mvn.artifactId()
+                        description = mvn.description();
+                        url = mvn.url()
+                        try {
+                            mvn.execute('clean test')
+                        }
+                        finally {
+                            junit allowEmptyResults: true, testResults: '**/target/surefire-reports/TEST-*.xml'
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('integration-test') {
+            configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
+                withEnv(['JAVA_HOME=/etc/alternatives/java_sdk_1.8.0']) {
                     def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
-                    version = mvn.changeVersion()
-                    artifactId = mvn.artifactId()
-                    description = mvn.description();
-                    url = mvn.url()
                     try {
-                        mvn.execute('clean test')
+                        mvn.execute('integration-test')
                     }
                     finally {
                         junit allowEmptyResults: true, testResults: '**/target/surefire-reports/TEST-*.xml'
@@ -71,22 +87,12 @@ def execute() {
             }
         }
 
-        stage('integration-test') {
-            configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
-                def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
-                try {
-                    mvn.execute('integration-test')
-                }
-                finally {
-                    junit allowEmptyResults: true, testResults: '**/target/surefire-reports/TEST-*.xml'
-                }
-            }
-        }
-
         stage('package') {
             configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
-                def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
-                mvn.execute('package')
+                withEnv(['JAVA_HOME=/etc/alternatives/java_sdk_1.8.0']) {
+                    def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
+                    mvn.execute('package')
+                }
             }
             stash includes: "target/${artifactId}-${version}.tar.gz", name: 'tar'
             stash includes: 'target/CHANGELOG.md', name: 'changelog'
@@ -142,9 +148,10 @@ def execute() {
                             if (env.BRANCH_NAME == 'master') {
                                 goals = 'deploy'
                                 profiles = 'gpg-signing,maven-central'
-
-                                def mvn = new MavenUtilities(env, steps, MAVEN_SETTINGS, GPG_PUBRING, GPG_SECRING)
-                                mvn.execute(goals, profiles)
+                                withEnv(['JAVA_HOME=/etc/alternatives/java_sdk_1.8.0']) {
+                                    def mvn = new MavenUtilities(env, steps, MAVEN_SETTINGS, GPG_PUBRING, GPG_SECRING)
+                                    mvn.execute(goals, profiles)
+                                }
                             }
                         }
                     }
