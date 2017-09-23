@@ -129,7 +129,6 @@ def execute() {
         unstash 'rpm'
         unstash 'deb'
         unstash 'tar'
-        unstash 'changelog'
         unstash 'docs'
 
         def image
@@ -138,6 +137,7 @@ def execute() {
         archiveArtifacts "target/docs/**/*"
 
         if (env.BRANCH_NAME == 'master') {
+            unstash 'changelog'
             stage('publish') {
                 withCredentials([string(credentialsId: 'github_api_token', variable: 'apiToken')]) {
                     githubRelease(
