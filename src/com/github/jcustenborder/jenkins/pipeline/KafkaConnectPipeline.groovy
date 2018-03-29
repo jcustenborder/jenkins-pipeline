@@ -45,76 +45,76 @@ def execute() {
             checkout scm
         }
 
-        docker.image(images.jdk8_docker_image).inside('--net host -v /var/run/docker.sock:/var/run/docker.sock') {
-            withEnv(['DOCKER_HOST=unix:///var/run/docker.sock']) {
-                stage('build') {
-                    configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
-                        withEnv(["JAVA_HOME=${images.jdk8_java_home}"]) {
-                            def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
-                            version = mvn.changeVersion()
-                            artifactId = mvn.artifactId()
-                            description = mvn.description();
-                            url = mvn.url()
-                            try {
-                                mvn.execute('clean test')
-                            }
-                            finally {
-                                junit allowEmptyResults: true, testResults: '**/target/surefire-reports/TEST-*.xml'
-                            }
+        docker.image(images.jdk8_docker_image).inside('--net host -v /var/run/docker.sock:/var/run/docker.sock -e DOCKER_HOST=unix:///var/run/docker.sock') {
+            stage('build') {
+                configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
+                    withEnv(["JAVA_HOME=${images.jdk8_java_home}"]) {
+                        def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
+                        version = mvn.changeVersion()
+                        artifactId = mvn.artifactId()
+                        description = mvn.description();
+                        url = mvn.url()
+                        try {
+                            mvn.execute('clean test')
+                        }
+                        finally {
+                            junit allowEmptyResults: true, testResults: '**/target/surefire-reports/TEST-*.xml'
                         }
                     }
                 }
+            }
 
-                stage('integration-test') {
-                    configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
-                        withEnv(["JAVA_HOME=${images.jdk8_java_home}"]) {
-                            def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
-                            try {
-                                mvn.execute('integration-test')
-                            }
-                            finally {
-                                junit allowEmptyResults: true, testResults: '**/target/surefire-reports/TEST-*.xml'
-                            }
+            stage('integration-test') {
+                configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
+                    withEnv(["JAVA_HOME=${images.jdk8_java_home}"]) {
+                        def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
+                        try {
+                            mvn.execute('integration-test')
+                        }
+                        finally {
+                            junit allowEmptyResults: true, testResults: '**/target/surefire-reports/TEST-*.xml'
                         }
                     }
                 }
+            }
 
-                stage('maven package') {
-                    configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
-                        withEnv(["JAVA_HOME=${images.jdk8_java_home}"]) {
-                            def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
-                            mvn.execute('package')
-                        }
+            stage('maven package') {
+                configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
+                    withEnv(["JAVA_HOME=${images.jdk8_java_home}"]) {
+                        def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
+                        mvn.execute('package')
                     }
-                    echo "Stashing target/${artifactId}-${version}.tar.gz"
-                    stash includes: "target/${artifactId}-${version}.tar.gz", name: 'tar'
-                    echo 'Stashing target/docs/**/**'
-                    stash includes: 'target/docs/**/**', name: 'docs'
-                    echo 'Stashing target/plugins/packages/*.zip'
-                    stash includes: 'target/plugins/packages/*.zip', name: 'plugin', allowEmpty: true
+                }
+                echo "Stashing target/${artifactId}-${version}.tar.gz"
+                stash includes: "target/${artifactId}-${version}.tar.gz", name: 'tar'
+                echo 'Stashing target/docs/**/**'
+                stash includes: 'target/docs/**/**', name: 'docs'
+                echo 'Stashing target/plugins/packages/*.zip'
+                stash includes: 'target/plugins/packages/*.zip', name: 'plugin', allowEmpty: true
 
-                    if (env.BRANCH_NAME == 'master') {
-                        echo 'Stashing target/CHANGELOG.md'
-                        stash includes: 'target/CHANGELOG.md', name: 'changelog'
-                    }
+                if (env.BRANCH_NAME == 'master') {
+                    echo 'Stashing target/CHANGELOG.md'
+                    stash includes: 'target/CHANGELOG.md', name: 'changelog'
                 }
             }
         }
-    }
 
-    stage('os packages') {
-        parallel 'rpm': {
-            node {
-                unstash 'tar'
-                docker.image(images.jdk8_docker_image).inside {
-                    createPackage(artifactId, 'rpm', version, description, url)
+
+
+        stage('os packages') {
+            parallel 'rpm': {
+                node {
+                    unstash 'tar'
+                    docker.image(images.jdk8_docker_image).inside {
+                        createPackage(artifactId, 'rpm', version, description, url)
+                    }
                 }
-            }
-        }, 'deb': {
-            node {
-                unstash 'tar'
-                docker.image(images.jdk8_docker_image).inside {
-                    createPackage(artifactId, 'deb', version, description, url)
+            }, 'deb': {
+                node {
+                    unstash 'tar'
+                    docker.image(images.jdk8_docker_image).inside {
+                        createPackage(artifactId, 'deb', version, description, url)
+                    }
                 }
             }
         }
