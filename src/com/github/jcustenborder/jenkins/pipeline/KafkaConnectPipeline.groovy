@@ -46,6 +46,7 @@ def execute() {
         }
 
         docker.image(images.jdk8_docker_image).inside("--net host -v /var/run/docker.sock:/var/run/docker.sock -e DOCKER_HOST='unix:///var/run/docker.sock'") {
+            sh 'docker ps'
             stage('build') {
                 configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
                     withEnv(["JAVA_HOME=${images.jdk8_java_home}"]) {
