@@ -73,7 +73,7 @@ def execute() {
                             mvn.execute('integration-test')
                         }
                         finally {
-                            junit allowEmptyResults: true, testResults: '**/target/surefire-reports/TEST-*.xml'
+                            junit allowEmptyResults: true, testResults: '**/target/failsafe-reports/TEST-*.xml'
                         }
                     }
                 }
