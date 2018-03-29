@@ -45,7 +45,7 @@ def execute() {
             checkout scm
         }
 
-        docker.image(images.jdk8_docker_image).inside('--net host -v /var/run/docker.sock:/var/run/docker.sock -e DOCKER_HOST=unix:///var/run/docker.sock') {
+        docker.image(images.jdk8_docker_image).inside("--net host -v /var/run/docker.sock:/var/run/docker.sock -e DOCKER_HOST='unix:///var/run/docker.sock'") {
             stage('build') {
                 configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
                     withEnv(["JAVA_HOME=${images.jdk8_java_home}"]) {
@@ -66,7 +66,9 @@ def execute() {
 
             stage('integration-test') {
                 configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
-                    withEnv(["JAVA_HOME=${images.jdk8_java_home}"]) {
+                    withEnv(["JAVA_HOME=${images.jdk8_java_home}",
+                             'DOCKER_HOST=unix:///var/run/docker.sock'
+                    ]) {
                         def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
                         try {
                             mvn.execute('integration-test')
