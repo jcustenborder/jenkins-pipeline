@@ -33,16 +33,6 @@ def createPackage(String name, String type, String version, String description, 
     stash includes: "target/*.${type}", name: type
 }
 
-def createDockerfile(String name, String version, String baseImage = 'confluentinc/cp-kafka-connect:3.2.2-1') {
-    def text = "FROM ${baseImage}\n" +
-            "MAINTAINER jcustenborder@gmail.com\n" +
-            "ADD ${name}-${version}.tar.gz /\n"
-
-    writeFile file: 'Dockerfile', text: text
-    stash includes: 'Dockerfile', name: 'Dockerfile'
-}
-
-
 def execute() {
     def version
     def artifactId
@@ -55,7 +45,7 @@ def execute() {
             checkout scm
         }
 
-        docker.image(images.jdk8_docker_image).inside {
+        docker.image(images.jdk8_docker_image).withRun('--net host').inside {
             stage('build') {
                 configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
                     withEnv(["JAVA_HOME=${images.jdk8_java_home}"]) {
@@ -99,6 +89,9 @@ def execute() {
                 stash includes: "target/${artifactId}-${version}.tar.gz", name: 'tar'
                 echo 'Stashing target/docs/**/**'
                 stash includes: 'target/docs/**/**', name: 'docs'
+                echo 'Stashing target/plugins/packages/*.zip'
+                stash includes: 'target/plugins/packages/*.zip', name: 'plugin', allowEmpty: true
+
                 if (env.BRANCH_NAME == 'master') {
                     echo 'Stashing target/CHANGELOG.md'
                     stash includes: 'target/CHANGELOG.md', name: 'changelog'
@@ -131,10 +124,9 @@ def execute() {
         unstash 'tar'
         unstash 'docs'
 
-        def image
-
         archiveArtifacts "target/${artifactId}-${version}.*"
         archiveArtifacts "target/docs/**/*"
+        archiveArtifacts "target/plugins/packages/*.zip", allowEmptyArchive: true
 
         if (env.BRANCH_NAME == 'master') {
             unstash 'changelog'
