@@ -45,7 +45,7 @@ def execute() {
             checkout scm
         }
 
-        docker.image(images.jdk8_docker_image).inside('--net host').inside {
+        docker.image(images.jdk8_docker_image).inside('--net host') {
             stage('build') {
                 configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
                     withEnv(["JAVA_HOME=${images.jdk8_java_home}"]) {
