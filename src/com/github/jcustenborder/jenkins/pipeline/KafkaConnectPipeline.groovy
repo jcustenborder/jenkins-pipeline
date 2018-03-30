@@ -64,25 +64,25 @@ def execute() {
                     }
                 }
             }
-            sh 'echo $DOCKER_HOST=$DOCKER_HOST'
-//            stage('integration-test') {
-//                configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
-//                    withEnv(["JAVA_HOME=${images.jdk8_java_home}"]) {
-//                        sh 'echo $DOCKER_HOST'
-//                        def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
-//                        try {
-//                            mvn.execute('integration-test')
-//                        }
-//                        finally {
-//                            junit allowEmptyResults: true, testResults: '**/target/failsafe-reports/TEST-*.xml'
-//                        }
-//                    }
-//                }
-//            }
+            sh 'echo DOCKER_HOST=$DOCKER_HOST'
+            stage('integration-test') {
+                configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
+                    withEnv(["JAVA_HOME=${images.jdk8_java_home}", 'DOCKER_HOST=tcp://127.0.0.1:2375']) {
+                        sh 'echo $DOCKER_HOST'
+                        def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
+                        try {
+                            mvn.execute('integration-test')
+                        }
+                        finally {
+                            junit allowEmptyResults: true, testResults: '**/target/failsafe-reports/TEST-*.xml'
+                        }
+                    }
+                }
+            }
 
             stage('maven package') {
                 configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
-                    withEnv(["JAVA_HOME=${images.jdk8_java_home}"]) {
+                    withEnv(["JAVA_HOME=${images.jdk8_java_home}", 'DOCKER_HOST=tcp://127.0.0.1:2375']) {
                         def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
                         mvn.execute('package')
                     }
@@ -148,7 +148,7 @@ def execute() {
                 docker.image(images.jdk8_docker_image).inside {
                     withCredentials([file(credentialsId: 'gpg_pubring', variable: 'GPG_PUBRING'), file(credentialsId: 'gpg_secring', variable: 'GPG_SECRING')]) {
                         configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
-                            withEnv(["JAVA_HOME=${images.jdk8_java_home}"]) {
+                            withEnv(["JAVA_HOME=${images.jdk8_java_home}", 'DOCKER_HOST=tcp://127.0.0.1:2375']) {
                                 if (env.BRANCH_NAME == 'master') {
                                     goals = 'deploy'
                                     profiles = 'gpg-signing,maven-central'
