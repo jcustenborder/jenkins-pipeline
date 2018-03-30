@@ -64,7 +64,7 @@ def execute() {
                     }
                 }
             }
-
+            sh 'echo $DOCKER_HOST=$DOCKER_HOST'
 //            stage('integration-test') {
 //                configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
 //                    withEnv(["JAVA_HOME=${images.jdk8_java_home}"]) {
