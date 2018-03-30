@@ -68,6 +68,7 @@ def execute() {
             stage('integration-test') {
                 configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
                     withEnv(["JAVA_HOME=${images.jdk8_java_home}"]) {
+                        sh 'echo $DOCKER_HOST'
                         def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
                         try {
                             mvn.execute('integration-test')
