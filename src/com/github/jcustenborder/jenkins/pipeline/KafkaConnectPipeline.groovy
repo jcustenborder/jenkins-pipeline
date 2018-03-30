@@ -127,9 +127,9 @@ def execute() {
         unstash 'tar'
         unstash 'docs'
 
-        archiveArtifacts "target/${artifactId}-${version}.*"
-        archiveArtifacts "target/docs/**/*"
-        archiveArtifacts "target/plugins/packages/*.zip", allowEmptyArchive: true
+        archiveArtifacts artifacts: "target/${artifactId}-${version}.*"
+        archiveArtifacts artifacts: "target/docs/**/*"
+        archiveArtifacts artifacts: "target/plugins/packages/*.zip", allowEmptyArchive: true
 
         if (env.BRANCH_NAME == 'master') {
             unstash 'changelog'
