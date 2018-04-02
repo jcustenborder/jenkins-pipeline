@@ -152,6 +152,7 @@ def execute() {
                             withCredentials([string(credentialsId: 'plugin_staging', variable: 'BUCKET')]) {
                                 s3Upload(
                                         acl: 'Private',
+                                        region: 'us-west-1',
                                         bucket: "${BUCKET}",
                                         includePathPattern: '*.zip',
                                         path: "jcustenborder/${artifactId}/${version}"
