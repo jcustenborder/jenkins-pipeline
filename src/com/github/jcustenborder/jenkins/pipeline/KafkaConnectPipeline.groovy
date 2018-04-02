@@ -148,13 +148,21 @@ def execute() {
 
                 if (fileExists('target/plugins/packages')) {
                     dir('target/plugins/packages') {
-                        withAWS(credentials: 'confluent_aws') {
+                        def zipFileName = "jcustenborder-${artifactId}-${version}-plugin.zip"
+                        unzip glob: 'manifest.json', zipFile: "${zipFileName}"
+
+                        withAWS(credentials: 'confluent_aws', region: 'us-west-1') {
                             withCredentials([string(credentialsId: 'plugin_staging', variable: 'BUCKET')]) {
                                 s3Upload(
                                         acl: 'Private',
-                                        region: 'us-west-1',
                                         bucket: "${BUCKET}",
-                                        includePathPattern: '*.zip',
+                                        includePathPattern: "${zipFileName}",
+                                        path: "jcustenborder/${artifactId}/${version}"
+                                )
+                                s3Upload(
+                                        acl: 'Private',
+                                        bucket: "${BUCKET}",
+                                        includePathPattern: 'manifest.json',
                                         path: "jcustenborder/${artifactId}/${version}"
                                 )
                             }
