@@ -153,6 +153,7 @@ def execute() {
                                 glob: '**/manifest.json',
                                 zipFile: "${zipFileName}"
                         )
+                        manifest_path = findFiles(glob: '**/manifest.json')
 
                         withAWS(credentials: 'confluent_aws', region: 'us-west-1') {
                             withCredentials([string(credentialsId: 'plugin_staging', variable: 'BUCKET')]) {
@@ -165,7 +166,7 @@ def execute() {
                                 s3Upload(
                                         acl: 'Private',
                                         bucket: "${BUCKET}",
-                                        includePathPattern: 'manifest.json',
+                                        includePathPattern: "${manifest_path[0].path}",
                                         path: "jcustenborder/${artifactId}/${version}/manifest.json"
                                 )
                             }
