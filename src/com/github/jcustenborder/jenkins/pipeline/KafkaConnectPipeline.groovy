@@ -145,6 +145,22 @@ def execute() {
                             excludes: 'target/*.jar'
                     )
                 }
+
+                if (fileExists('target/plugins/packages')) {
+                    dir('target/plugins/packages') {
+                        withAWS(credentials: 'confluent_aws') {
+                            withCredentials([string(credentialsId: 'plugin_staging', variable: 'BUCKET')]) {
+                                s3Upload(
+                                        acl: 'Private',
+                                        bucket: "${BUCKET}",
+                                        includePathPattern: '*.zip',
+                                        path: "jcustenborder/${artifactId}/${version}"
+                                )
+                            }
+                        }
+                    }
+                }
+
                 docker.image(images.jdk8_docker_image).inside {
                     withCredentials([file(credentialsId: 'gpg_pubring', variable: 'GPG_PUBRING'), file(credentialsId: 'gpg_secring', variable: 'GPG_SECRING')]) {
                         configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
