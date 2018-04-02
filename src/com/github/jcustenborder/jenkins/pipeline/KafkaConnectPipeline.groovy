@@ -157,13 +157,13 @@ def execute() {
                                         acl: 'Private',
                                         bucket: "${BUCKET}",
                                         includePathPattern: "${zipFileName}",
-                                        path: "jcustenborder/${artifactId}/${version}"
+                                        path: "jcustenborder/${artifactId}/${version}/${zipFileName}"
                                 )
                                 s3Upload(
                                         acl: 'Private',
                                         bucket: "${BUCKET}",
                                         includePathPattern: 'manifest.json',
-                                        path: "jcustenborder/${artifactId}/${version}"
+                                        path: "jcustenborder/${artifactId}/${version}/manifest.json"
                                 )
                             }
                         }
