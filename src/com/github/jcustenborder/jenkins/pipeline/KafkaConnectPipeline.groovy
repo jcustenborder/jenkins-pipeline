@@ -100,27 +100,27 @@ def execute() {
                 }
             }
         }
+    }
 
 
-
-        stage('os packages') {
-            parallel 'rpm': {
-                node {
-                    unstash 'tar'
-                    docker.image(images.jdk8_docker_image).inside {
-                        createPackage(artifactId, 'rpm', version, description, url)
-                    }
+    stage('os packages') {
+        parallel 'rpm': {
+            node {
+                unstash 'tar'
+                docker.image(images.jdk8_docker_image).inside {
+                    createPackage(artifactId, 'rpm', version, description, url)
                 }
-            }, 'deb': {
-                node {
-                    unstash 'tar'
-                    docker.image(images.jdk8_docker_image).inside {
-                        createPackage(artifactId, 'deb', version, description, url)
-                    }
+            }
+        }, 'deb': {
+            node {
+                unstash 'tar'
+                docker.image(images.jdk8_docker_image).inside {
+                    createPackage(artifactId, 'deb', version, description, url)
                 }
             }
         }
     }
+
 
     node {
         unstash 'rpm'
