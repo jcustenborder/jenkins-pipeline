@@ -149,7 +149,10 @@ def execute() {
                 if (fileExists('target/plugins/packages')) {
                     dir('target/plugins/packages') {
                         def zipFileName = "jcustenborder-${artifactId}-${version}-plugin.zip"
-                        unzip glob: 'manifest.json', zipFile: "${zipFileName}"
+                        unzip(
+                                glob: '**/manifest.json',
+                                zipFile: "${zipFileName}"
+                        )
 
                         withAWS(credentials: 'confluent_aws', region: 'us-west-1') {
                             withCredentials([string(credentialsId: 'plugin_staging', variable: 'BUCKET')]) {
