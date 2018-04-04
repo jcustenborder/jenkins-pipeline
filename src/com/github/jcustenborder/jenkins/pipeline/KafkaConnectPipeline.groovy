@@ -19,7 +19,7 @@ def createPackage(String name, String type, String version, String description, 
     sh "/usr/local/bin/fpm --input-type tar " +
             "--output-type ${type} " +
             "--version ${version} " +
-            (env.BRANCH_NAME == 'master'? "" : "--iteration ${env.BUILD_NUMBER}") +
+            (env.BRANCH_NAME == 'master'? "" : "--iteration ${env.BUILD_NUMBER} ") +
             "--name ${name} " +
             "--url ${url} " +
             "--description '${description}' " +
