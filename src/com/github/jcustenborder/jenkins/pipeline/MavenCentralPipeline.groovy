@@ -33,7 +33,7 @@ def execute() {
                                 goals = 'clean deploy'
                                 profiles = 'gpg-signing,maven-central'
                             } else {
-                                goals = 'clean package'
+                                goals = 'clean verify'
                             }
 
                             url = mvn.url()
