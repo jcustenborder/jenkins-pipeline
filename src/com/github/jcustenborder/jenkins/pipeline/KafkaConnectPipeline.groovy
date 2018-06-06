@@ -132,69 +132,6 @@ def execute() {
 
         if (env.BRANCH_NAME == 'master') {
             stage('publish') {
-                withCredentials([string(credentialsId: 'github_api_token', variable: 'apiToken')]) {
-                    def apiUrl = "https://api.github.com/repos/${env.JOB_NAME}"
-
-                    def release_notes_markdown = """
-{{#tags}}
-## {{name}}
-{{#issues}}
-{{#hasIssue}}
-{{#hasLink}}
-### {{name}} [{{issue}}]({{link}}) {{title}}
-{{/hasLink}}
-{{^hasLink}}
-### {{name}} {{issue}} {{title}}
-{{/hasLink}}
-{{/hasIssue}}
-{{^hasIssue}}
-### {{name}}
-{{/hasIssue}}
-{{#commits}}
-**{{{messageTitle}}}**
-{{#messageBodyItems}}
-* {{.}}
-{{/messageBodyItems}}
-[{{hash}}](../commit/{{hash}}) {{authorName}} *{{commitTime}}*
-{{/commits}}
-{{/issues}}
-{{/tags}}
-"""
-
-                    def release_notes_rst = """
-=========
-Changelog
-=========
-
-{{#tags}}
-
-**{{{name}}}**
-
-.. csv-table::
-    :header: "Date","Commit","Author","Message"
-
-    {{#commits}}
-    "{{{commitTime}}}","`{{{hash}}} <../commit/{{{hash}}}>`_","{{{authorName}}}","{{{message}}}"
-    {{/commits}}
-
-{{/tags}}
-"""
-                    def markdown = gitChangelog gitHub: [api: "${apiUrl}", token: "${apiToken}"], returnType: 'STRING', template: "${release_notes_markdown}"
-                    writeFile file: 'target/CHANGELOG.md', text: markdown
-
-                    def rst = gitChangelog gitHub: [api: "${apiUrl}", token: "${apiToken}"], returnType: 'STRING', template: "${release_notes_rst}"
-                    writeFile file: 'target/changelog.rst', text: rst
-
-                    githubRelease(
-                            token: apiToken,
-                            repositoryName: "jcustenborder/${artifactId}",
-                            tagName: version,
-                            descriptionFile: 'target/CHANGELOG.md',
-                            includes: "target/${artifactId}-${version}.*",
-                            excludes: 'target/*.jar'
-                    )
-                }
-
                 if (fileExists('target/plugins/packages')) {
                     dir('target/plugins/packages') {
                         def zipFileName = "jcustenborder-${artifactId}-${version}-plugin.zip"
