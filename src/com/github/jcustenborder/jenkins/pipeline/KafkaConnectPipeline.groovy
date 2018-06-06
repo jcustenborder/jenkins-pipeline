@@ -8,6 +8,52 @@ triggers {
     upstream(upstreamProjects: "jcustenborder/connect-utils/job/master", threshold: hudson.model.Result.SUCCESS)
 }
 
+def release_notes_markdown = """
+{{#tags}}
+## {{name}}
+{{#issues}}
+{{#hasIssue}}
+{{#hasLink}}
+### {{name}} [{{issue}}]({{link}}) {{title}}
+{{/hasLink}}
+{{^hasLink}}
+### {{name}} {{issue}} {{title}}
+{{/hasLink}}
+{{/hasIssue}}
+{{^hasIssue}}
+### {{name}}
+{{/hasIssue}}
+{{#commits}}
+**{{{messageTitle}}}**
+{{#messageBodyItems}}
+* {{.}}
+{{/messageBodyItems}}
+[{{hash}}](${project.url}/commit/{{hash}}) {{authorName}} *{{commitTime}}*
+{{/commits}}
+{{/issues}}
+{{/tags}}
+"""
+
+def release_notes_rst = """
+=========
+Changelog
+=========
+
+{{#tags}}
+
+**{{{name}}}**
+
+.. csv-table::
+    :header: "Date","Commit","Author","Message"
+
+    {{#commits}}
+    "{{{commitTime}}}","`{{{hash}}} <${project.url}/commit/{{{hash}}}>`_","{{{authorName}}}","{{{message}}}"
+    {{/commits}}
+
+{{/tags}}
+"""
+
+
 def createPackage(String name, String type, String version, String description, String url) {
     def inputPath = "${pwd()}/target/${name}-${version}.tar.gz"
     def outputPath = "${pwd()}/target/${name}-${version}.${type}"
@@ -19,7 +65,7 @@ def createPackage(String name, String type, String version, String description, 
     sh "/usr/local/bin/fpm --input-type tar " +
             "--output-type ${type} " +
             "--version ${version} " +
-            (env.BRANCH_NAME == 'master'? "" : "--iteration ${env.BUILD_NUMBER} ") +
+            (env.BRANCH_NAME == 'master' ? "" : "--iteration ${env.BUILD_NUMBER} ") +
             "--name ${name} " +
             "--url ${url} " +
             "--description '${description}' " +
@@ -94,11 +140,6 @@ def execute() {
                 stash includes: 'target/docs/**/**', name: 'docs'
                 echo 'Stashing target/plugins/packages/*.zip'
                 stash includes: 'target/plugins/packages/*.zip', name: 'plugin', allowEmpty: true
-
-                if (env.BRANCH_NAME == 'master') {
-                    echo 'Stashing target/CHANGELOG.md'
-                    stash includes: 'target/CHANGELOG.md', name: 'changelog'
-                }
             }
         }
     }
@@ -137,6 +178,17 @@ def execute() {
             unstash 'changelog'
             stage('publish') {
                 withCredentials([string(credentialsId: 'github_api_token', variable: 'apiToken')]) {
+                    def apiUrl = "https://api.github.com/repos/${env.JOB_NAME}"
+                    def markdown = gitChangelog gitHub: [api: apiUrl, token: apiToken], returnType: 'STRING', template: release_notes_markdown
+                    writeFile file: 'target/CHANGELOG.md', text: markdown
+
+                    def rst = gitChangelog gitHub: [api: apiUrl, token: apiToken], returnType: 'STRING', template: release_notes_rst
+                    writeFile file: 'target/changelog.rst', text: rst
+
+
+                    echo 'Stashing target/CHANGELOG.md'
+                    stash includes: 'target/CHANGELOG.md', name: 'changelog'
+
                     githubRelease(
                             token: apiToken,
                             repositoryName: "jcustenborder/${artifactId}",
