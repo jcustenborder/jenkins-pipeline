@@ -155,7 +155,7 @@ def execute() {
 {{#messageBodyItems}}
 * {{.}}
 {{/messageBodyItems}}
-[{{hash}}](${project.url}/commit/{{hash}}) {{authorName}} *{{commitTime}}*
+[{{hash}}](../commit/{{hash}}) {{authorName}} *{{commitTime}}*
 {{/commits}}
 {{/issues}}
 {{/tags}}
@@ -174,7 +174,7 @@ Changelog
     :header: "Date","Commit","Author","Message"
 
     {{#commits}}
-    "{{{commitTime}}}","`{{{hash}}} <${project.url}/commit/{{{hash}}}>`_","{{{authorName}}}","{{{message}}}"
+    "{{{commitTime}}}","`{{{hash}}} <../commit/{{{hash}}}>`_","{{{authorName}}}","{{{message}}}"
     {{/commits}}
 
 {{/tags}}
