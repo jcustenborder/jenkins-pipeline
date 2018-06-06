@@ -175,7 +175,6 @@ def execute() {
         archiveArtifacts artifacts: "target/plugins/packages/*.zip", allowEmptyArchive: true
 
         if (env.BRANCH_NAME == 'master') {
-            unstash 'changelog'
             stage('publish') {
                 withCredentials([string(credentialsId: 'github_api_token', variable: 'apiToken')]) {
                     def apiUrl = "https://api.github.com/repos/${env.JOB_NAME}"
@@ -184,10 +183,6 @@ def execute() {
 
                     def rst = gitChangelog gitHub: [api: apiUrl, token: apiToken], returnType: 'STRING', template: release_notes_rst
                     writeFile file: 'target/changelog.rst', text: rst
-
-
-                    echo 'Stashing target/CHANGELOG.md'
-                    stash includes: 'target/CHANGELOG.md', name: 'changelog'
 
                     githubRelease(
                             token: apiToken,
