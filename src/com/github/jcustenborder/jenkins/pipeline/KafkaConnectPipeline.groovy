@@ -175,21 +175,21 @@ def execute() {
                     }
                 }
 
-                docker.image(images.jdk8_docker_image).inside {
-                    withCredentials([file(credentialsId: 'gpg_pubring', variable: 'GPG_PUBRING'), file(credentialsId: 'gpg_secring', variable: 'GPG_SECRING')]) {
-                        configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
-                            withEnv(["JAVA_HOME=${images.jdk8_java_home}", 'DOCKER_HOST=tcp://127.0.0.1:2375']) {
-                                if (env.BRANCH_NAME == 'master') {
-                                    goals = 'deploy'
-                                    profiles = 'gpg-signing,maven-central'
-
-                                    def mvn = new MavenUtilities(env, steps, MAVEN_SETTINGS, GPG_PUBRING, GPG_SECRING)
-                                    mvn.execute(goals, profiles)
-                                }
-                            }
-                        }
-                    }
-                }
+//                docker.image(images.jdk8_docker_image).inside {
+//                    withCredentials([file(credentialsId: 'gpg_pubring', variable: 'GPG_PUBRING'), file(credentialsId: 'gpg_secring', variable: 'GPG_SECRING')]) {
+//                        configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
+//                            withEnv(["JAVA_HOME=${images.jdk8_java_home}", 'DOCKER_HOST=tcp://127.0.0.1:2375']) {
+//                                if (env.BRANCH_NAME == 'master') {
+//                                    goals = 'deploy'
+//                                    profiles = 'gpg-signing,maven-central'
+//
+//                                    def mvn = new MavenUtilities(env, steps, MAVEN_SETTINGS, GPG_PUBRING, GPG_SECRING)
+//                                    mvn.execute(goals, profiles)
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
             }
         }
     }
