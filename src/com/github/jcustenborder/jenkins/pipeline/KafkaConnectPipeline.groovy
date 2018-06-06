@@ -8,7 +8,30 @@ triggers {
     upstream(upstreamProjects: "jcustenborder/connect-utils/job/master", threshold: hudson.model.Result.SUCCESS)
 }
 
+def uploadPlugin(zipFileName, owner, artifactId, version) {
+    unzip(
+            glob: '**/manifest.json',
+            zipFile: "${zipFileName}"
+    )
+    manifest_path = findFiles(glob: '**/manifest.json')
 
+    withAWS(credentials: 'confluent_aws', region: 'us-west-1') {
+        withCredentials([string(credentialsId: 'plugin_staging', variable: 'BUCKET')]) {
+            s3Upload(
+                    acl: 'Private',
+                    bucket: "${BUCKET}",
+                    includePathPattern: "${zipFileName}",
+                    path: "${owner}/${artifactId}/${version}/${zipFileName}"
+            )
+            s3Upload(
+                    acl: 'Private',
+                    bucket: "${BUCKET}",
+                    includePathPattern: "${manifest_path[0].path}",
+                    path: "${owner}/${artifactId}/${version}/manifest.json"
+            )
+        }
+    }
+}
 
 def createPackage(String name, String type, String version, String description, String url) {
     def inputPath = "${pwd()}/target/${name}-${version}.tar.gz"
@@ -135,27 +158,12 @@ def execute() {
                 if (fileExists('target/plugins/packages')) {
                     dir('target/plugins/packages') {
                         def zipFileName = "jcustenborder-${artifactId}-${version}-plugin.zip"
-                        unzip(
-                                glob: '**/manifest.json',
-                                zipFile: "${zipFileName}"
-                        )
-                        manifest_path = findFiles(glob: '**/manifest.json')
-
-                        withAWS(credentials: 'confluent_aws', region: 'us-west-1') {
-                            withCredentials([string(credentialsId: 'plugin_staging', variable: 'BUCKET')]) {
-                                s3Upload(
-                                        acl: 'Private',
-                                        bucket: "${BUCKET}",
-                                        includePathPattern: "${zipFileName}",
-                                        path: "jcustenborder/${artifactId}/${version}/${zipFileName}"
-                                )
-                                s3Upload(
-                                        acl: 'Private',
-                                        bucket: "${BUCKET}",
-                                        includePathPattern: "${manifest_path[0].path}",
-                                        path: "jcustenborder/${artifactId}/${version}/manifest.json"
-                                )
-                            }
+                        if(fileExists(zipFileName)) {
+                            uploadPlugin(zipFileName, 'jcustenborder', artifactId, version)
+                        }
+                        zipFileName = "confluentinc-${artifactId}-${version}-plugin.zip"
+                        if(fileExists(zipFileName)) {
+                            uploadPlugin(zipFileName, 'confluentinc', artifactId, version)
                         }
                     }
                 }
