@@ -16,7 +16,7 @@ class MavenUtilities implements Serializable {
     }
 
     def shouldChangeVersion(pom) {
-        return env.BRANCH_NAME == 'master' && pom.version ==~ /^[\d+\.]+$/
+        return env.BRANCH_NAME == 'master' && pom.version.endsWith('-SNAPSHOT')
     }
 
     def artifactId() {
