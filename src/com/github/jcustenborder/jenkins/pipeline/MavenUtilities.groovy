@@ -15,10 +15,6 @@ class MavenUtilities implements Serializable {
         this.secringPath = secringPath
     }
 
-    def shouldChangeVersion(pom) {
-        return env.BRANCH_NAME == 'master' && pom.version.endsWith('-SNAPSHOT')
-    }
-
     def artifactId() {
         return steps.readMavenPom().artifactId
     }
@@ -34,7 +30,7 @@ class MavenUtilities implements Serializable {
     def changeVersion() {
         def pom = steps.readMavenPom()
 
-        if (!shouldChangeVersion(pom)) {
+        if (env.BRANCH_NAME != 'master') {
             steps.echo "version changes only on master. Current branch is ${env.BRANCH_NAME}"
             return pom.version
         }
