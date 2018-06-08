@@ -40,7 +40,7 @@ class MavenUtilities implements Serializable {
         }
 
         if (!pom.version.endsWith("-SNAPSHOT")) {
-            steps.echo "Version '${pom.version}' does end with -SNAPSHOT."
+            steps.echo "Version '${pom.version}' does not end with -SNAPSHOT."
             return pom.version
         }
 
