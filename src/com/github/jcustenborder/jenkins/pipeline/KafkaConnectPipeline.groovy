@@ -117,6 +117,8 @@ def execute() {
                 stash includes: "target/${artifactId}-${version}.tar.gz", name: 'tar'
                 echo 'Stashing target/docs/**/**'
                 stash includes: 'target/docs/**/**', name: 'docs'
+                echo 'Stashing target/confluent-docs/**/**'
+                stash includes: 'target/confluent-docs/**/**', name: 'confluent-docs', allowEmpty: true
                 echo 'Stashing target/plugins/packages/*.zip'
                 stash includes: 'target/plugins/packages/*.zip', name: 'plugin', allowEmpty: true
             }
@@ -148,10 +150,12 @@ def execute() {
         unstash 'deb'
         unstash 'tar'
         unstash 'docs'
+        unstash 'confluent-docs'
 
         archiveArtifacts artifacts: "target/${artifactId}-${version}.*"
         archiveArtifacts artifacts: "target/docs/**/*"
         archiveArtifacts artifacts: "target/plugins/packages/*.zip", allowEmptyArchive: true
+        archiveArtifacts artifacts: "target/confluent-docs/**/**", allowEmptyArchive: true
 
         if (env.BRANCH_NAME == 'master') {
             stage('publish') {
