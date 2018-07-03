@@ -9,13 +9,13 @@ triggers {
 }
 
 def uploadPlugin(owner, artifactId, version) {
-    def zipFiles = findFiles(glob: "target/*${artifactId}-${version}*.zip")
+    def zipFiles = findFiles(glob: "target/{plugins,components}/*${artifactId}-${version}*.zip")
     def zipFileName
 
     if (zipFiles) {
         zipFileName = zipFiles[0].path
     } else {
-        error("Could not find artifact that matched 'target/*${artifactId}-${version}*.zip'")
+        error("Could not find artifact that matched 'target/{plugins,components}/*${artifactId}-${version}*.zip'")
     }
 
     unzip(
@@ -90,8 +90,7 @@ def execute() {
         }
 
         archiveArtifacts artifacts: "target/${artifactId}-${version}.*"
-        archiveArtifacts artifacts: "target/plugins/packages/*.zip", allowEmptyArchive: true
-        archiveArtifacts artifacts: "target/components/packages/*.zip", allowEmptyArchive: true
+        archiveArtifacts artifacts: "target/{plugins,components}/packages/*.zip"
         archiveArtifacts artifacts: "target/confluent-docs/**/**", allowEmptyArchive: true
 
         if (env.BRANCH_NAME == 'master') {
