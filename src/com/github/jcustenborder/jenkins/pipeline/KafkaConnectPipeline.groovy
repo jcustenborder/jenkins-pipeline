@@ -121,6 +121,8 @@ def execute() {
                 stash includes: 'target/confluent-docs/**/**', name: 'confluent-docs', allowEmpty: true
                 echo 'Stashing target/plugins/packages/*.zip'
                 stash includes: 'target/plugins/packages/*.zip', name: 'plugin', allowEmpty: true
+                echo 'Stashing target/components/packages/*.zip'
+                stash includes: 'target/components/packages/*.zip', name: 'plugin', allowEmpty: true
             }
         }
     }
@@ -155,6 +157,7 @@ def execute() {
         archiveArtifacts artifacts: "target/${artifactId}-${version}.*"
         archiveArtifacts artifacts: "target/docs/**/*"
         archiveArtifacts artifacts: "target/plugins/packages/*.zip", allowEmptyArchive: true
+        archiveArtifacts artifacts: "target/components/packages/*.zip", allowEmptyArchive: true
         archiveArtifacts artifacts: "target/confluent-docs/**/**", allowEmptyArchive: true
 
         if (env.BRANCH_NAME == 'master') {
