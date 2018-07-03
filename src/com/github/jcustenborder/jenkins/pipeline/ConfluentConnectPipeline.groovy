@@ -51,8 +51,6 @@ def uploadPlugin(owner, artifactId, version) {
 def execute() {
     def version
     def artifactId
-    def description
-    def url
 
     node {
         stage('checkout') {
@@ -68,8 +66,6 @@ def execute() {
                     stage('build') {
                         version = mvn.changeVersion()
                         artifactId = mvn.artifactId()
-                        description = mvn.description();
-                        url = mvn.url()
                         try {
                             mvn.execute('clean test')
                         }
