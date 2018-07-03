@@ -74,7 +74,6 @@ def execute() {
                         }
                     }
                     stage('integration-test') {
-                        sh 'echo $DOCKER_HOST'
                         try {
                             mvn.execute('integration-test')
                         }
@@ -90,7 +89,7 @@ def execute() {
         }
 
         archiveArtifacts artifacts: "target/${artifactId}-${version}.*"
-        archiveArtifacts artifacts: "target/**/packages/${artifactId}-${version}*.zip"
+        archiveArtifacts artifacts: "target/**/packages/*${artifactId}-${version}*.zip"
         archiveArtifacts artifacts: "target/confluent-docs/**/**", allowEmptyArchive: true
 
         if (env.BRANCH_NAME == 'master') {
