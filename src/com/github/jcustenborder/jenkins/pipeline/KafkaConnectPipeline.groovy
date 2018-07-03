@@ -171,6 +171,19 @@ def execute() {
                         }
                     }
                 }
+                if (fileExists('target/components/packages')) {
+                    dir('target/components/packages') {
+                        def zipFileName = "jcustenborder-${artifactId}-${version}.zip"
+                        if(fileExists(zipFileName)) {
+                            uploadPlugin(zipFileName, 'jcustenborder', artifactId, version)
+                        }
+                        zipFileName = "confluentinc-${artifactId}-${version}.zip"
+                        if(fileExists(zipFileName)) {
+                            uploadPlugin(zipFileName, 'confluentinc', artifactId, version)
+                        }
+                    }
+                }
+
 
 //                docker.image(images.jdk8_docker_image).inside {
 //                    withCredentials([file(credentialsId: 'gpg_pubring', variable: 'GPG_PUBRING'), file(credentialsId: 'gpg_secring', variable: 'GPG_SECRING')]) {
