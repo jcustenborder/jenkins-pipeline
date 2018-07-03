@@ -9,13 +9,13 @@ triggers {
 }
 
 def uploadPlugin(owner, artifactId, version) {
-    def zipFiles = findFiles(glob: "target/**/packages/${artifactId}-${version}*.zip")
+    def zipFiles = findFiles(glob: "target/**/packages/*${artifactId}-${version}*.zip")
     def zipFileName
 
     if (zipFiles) {
         zipFileName = zipFiles[0].path
     } else {
-        error("Could not find artifact that matched 'target/{plugins,components}/*${artifactId}-${version}*.zip'")
+        error("Could not find artifact that matched 'target/**/packages/*${artifactId}-${version}*.zip'")
     }
 
     unzip(
