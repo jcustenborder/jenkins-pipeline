@@ -9,7 +9,7 @@ triggers {
 }
 
 def uploadPlugin(owner, artifactId, version) {
-    def zipFiles = findFiles(glob: "target/{plugins,components}/*${artifactId}-${version}*.zip")
+    def zipFiles = findFiles(glob: "target/**/packages/${artifactId}-${version}*.zip")
     def zipFileName
 
     if (zipFiles) {
@@ -90,7 +90,7 @@ def execute() {
         }
 
         archiveArtifacts artifacts: "target/${artifactId}-${version}.*"
-        archiveArtifacts artifacts: "target/{plugins,components}/packages/*.zip"
+        archiveArtifacts artifacts: "target/**/packages/${artifactId}-${version}*.zip"
         archiveArtifacts artifacts: "target/confluent-docs/**/**", allowEmptyArchive: true
 
         if (env.BRANCH_NAME == 'master') {
