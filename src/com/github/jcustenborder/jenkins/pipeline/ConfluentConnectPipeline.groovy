@@ -1,7 +1,7 @@
 package com.github.jcustenborder.jenkins.pipeline
 
 properties([
-        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '10'))
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '30'))
 ])
 
 triggers {
@@ -12,8 +12,8 @@ def uploadPlugin(owner, artifactId, version) {
     def zipFiles = findFiles(glob: "target/*${artifactId}-${version}*.zip")
     def zipFileName
 
-    if(zipFiles) {
-        zipFileName=zipFiles[0].path
+    if (zipFiles) {
+        zipFileName = zipFiles[0].path
     } else {
         error("Could not find artifact that matched 'target/*${artifactId}-${version}*.zip'")
     }
@@ -24,7 +24,7 @@ def uploadPlugin(owner, artifactId, version) {
     )
     def manifests = findFiles(glob: '**/manifest.json')
 
-    if(manifests) {
+    if (manifests) {
         def manifestPath = manifests[0]
         withAWS(credentials: 'confluent_aws', region: 'us-west-1') {
             withCredentials([string(credentialsId: 'plugin_staging', variable: 'BUCKET')]) {
@@ -64,8 +64,8 @@ def execute() {
             sh 'docker ps'
             configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
                 withEnv(["JAVA_HOME=${images.jdk8_java_home}", 'DOCKER_HOST=tcp://127.0.0.1:2375']) {
+                    def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
                     stage('build') {
-                        def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
                         version = mvn.changeVersion()
                         artifactId = mvn.artifactId()
                         description = mvn.description();
@@ -79,7 +79,6 @@ def execute() {
                     }
                     stage('integration-test') {
                         sh 'echo $DOCKER_HOST'
-                        def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
                         try {
                             mvn.execute('integration-test')
                         }
@@ -88,7 +87,6 @@ def execute() {
                         }
                     }
                     stage('maven package') {
-                        def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
                         mvn.execute('package')
                     }
                 }
