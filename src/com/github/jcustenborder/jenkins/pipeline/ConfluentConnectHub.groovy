@@ -3,10 +3,12 @@ package com.github.jcustenborder.jenkins.pipeline
 class ConfluentConnectHub implements Serializable {
     def production
     def steps
+    def env
 
-    ConfluentConnectHub(steps, Boolean production) {
+    ConfluentConnectHub(env, steps, Boolean production) {
         this.steps = steps
         this.production = production
+        this.env = env
     }
 
     def uploadPlugin(owner, artifactId, version) {
@@ -34,13 +36,13 @@ class ConfluentConnectHub implements Serializable {
                         this.steps.s3Upload(
                                 acl: 'Private',
                                 file: "${zipFile.path}",
-                                bucket: "${BUCKET}",
+                                bucket: "${env.BUCKET}",
                                 path: "${owner}/${artifactId}/${version}/${zipFile.name}"
                         )
                         this.steps.s3Upload(
                                 acl: 'Private',
                                 file: "${manifestPath.path}",
-                                bucket: "${BUCKET}",
+                                bucket: "${env.BUCKET}",
                                 path: "${owner}/${artifactId}/${version}/manifest.json"
                         )
                     }
