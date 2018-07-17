@@ -54,7 +54,7 @@ def execute() {
 
         if (env.BRANCH_NAME == 'master') {
             connectHub = new ConfluentConnectHub(steps, true)
-            connectHub.upload('confluentinc', artifactId, version)
+            connectHub.uploadPlugin('confluentinc', artifactId, version)
         }
     }
 }
