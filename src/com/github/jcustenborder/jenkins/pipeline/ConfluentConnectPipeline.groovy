@@ -8,46 +8,6 @@ triggers {
     upstream(upstreamProjects: "jcustenborder/connect-utils/job/master", threshold: hudson.model.Result.SUCCESS)
 }
 
-def uploadPlugin(owner, artifactId, version) {
-    def zipFiles = findFiles(glob: "target/**/packages/*${artifactId}-${version}*.zip")
-    def zipFileName
-
-    if (zipFiles) {
-        zipFileName = zipFiles[0].path
-    } else {
-        error("Could not find artifact that matched 'target/**/packages/*${artifactId}-${version}*.zip'")
-    }
-
-    unzip(
-            glob: '**/manifest.json',
-            zipFile: "${zipFileName}"
-    )
-    def manifests = findFiles(glob: '**/manifest.json')
-
-    if (manifests) {
-        def manifestPath = manifests[0]
-        withAWS(credentials: 'confluent_aws', region: 'us-west-1') {
-            withCredentials([string(credentialsId: 'plugin_staging', variable: 'BUCKET')]) {
-                s3Upload(
-                        acl: 'Private',
-                        bucket: "${BUCKET}",
-                        includePathPattern: "${zipFileName}",
-                        path: "${owner}/${artifactId}/${version}/${zipFileName}"
-                )
-                s3Upload(
-                        acl: 'Private',
-                        bucket: "${BUCKET}",
-                        includePathPattern: "${manifestPath.path}",
-                        path: "${owner}/${artifactId}/${version}/manifest.json"
-                )
-            }
-        }
-    } else {
-        error("Could not find manifest in zip that matched '**/manifest.json'")
-    }
-}
-
-
 def execute() {
     def version
     def artifactId
@@ -93,9 +53,8 @@ def execute() {
         archiveArtifacts artifacts: "target/confluent-docs/**/**", allowEmptyArchive: true
 
         if (env.BRANCH_NAME == 'master') {
-            stage('publish') {
-                uploadPlugin('confluentinc', artifactId, version)
-            }
+            connectHub = new ConfluentConnectHub(steps, true)
+            connectHub.upload('confluentinc', artifactId, version)
         }
     }
 }
