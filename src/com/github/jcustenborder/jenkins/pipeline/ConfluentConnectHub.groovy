@@ -17,7 +17,7 @@ class ConfluentConnectHub implements Serializable {
             if (zipFiles) {
                 zipFile = zipFiles[0]
             } else {
-                error("Could not find artifact that matched 'target/**/packages/*${artifactId}-${version}*.zip'")
+                this.steps.error("Could not find artifact that matched 'target/**/packages/*${artifactId}-${version}*.zip'")
             }
 
             this.steps.unzip(
@@ -30,7 +30,7 @@ class ConfluentConnectHub implements Serializable {
                 def manifestPath = manifests[0]
 
                 this.steps.withAWS(credentials: 'confluent_aws', region: 'us-west-1') {
-                    this.steps.withCredentials([string(credentialsId: 'plugin_staging', variable: 'BUCKET')]) {
+                    this.steps.withCredentials([this.steps.string(credentialsId: 'plugin_staging', variable: 'BUCKET')]) {
                         this.steps.s3Upload(
                                 acl: 'Private',
                                 file: "${zipFile.path}",
@@ -46,7 +46,7 @@ class ConfluentConnectHub implements Serializable {
                     }
                 }
             } else {
-                error("Could not find manifest in zip that matched '**/manifest.json'")
+                this.steps.error("Could not find manifest in zip that matched '**/manifest.json'")
             }
         }
     }
