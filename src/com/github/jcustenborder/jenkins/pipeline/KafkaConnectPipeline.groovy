@@ -95,7 +95,7 @@ def execute() {
                 echo 'Stashing target/confluent-docs/**/**'
                 stash includes: 'target/confluent-docs/**/**', name: 'confluent-docs', allowEmpty: true
                 echo 'Stashing target/**/*.zip'
-                stash includes: 'target/plugins/packages/*.zip', name: 'plugin', allowEmpty: true
+                stash includes: 'target/**/*.zip', name: 'plugin', allowEmpty: true
             }
         }
     }
