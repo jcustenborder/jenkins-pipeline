@@ -8,31 +8,6 @@ triggers {
     upstream(upstreamProjects: "jcustenborder/connect-utils/job/master", threshold: hudson.model.Result.SUCCESS)
 }
 
-def uploadPlugin(zipFileName, owner, artifactId, version) {
-    unzip(
-            glob: '**/manifest.json',
-            zipFile: "${zipFileName}"
-    )
-    manifest_path = findFiles(glob: '**/manifest.json')
-
-    withAWS(credentials: 'confluent_aws', region: 'us-west-1') {
-        withCredentials([string(credentialsId: 'plugin_staging', variable: 'BUCKET')]) {
-            s3Upload(
-                    acl: 'Private',
-                    bucket: "${BUCKET}",
-                    includePathPattern: "${zipFileName}",
-                    path: "${owner}/${artifactId}/${version}/${zipFileName}"
-            )
-            s3Upload(
-                    acl: 'Private',
-                    bucket: "${BUCKET}",
-                    includePathPattern: "${manifest_path[0].path}",
-                    path: "${owner}/${artifactId}/${version}/manifest.json"
-            )
-        }
-    }
-}
-
 def createPackage(String name, String type, String version, String description, String url) {
     def inputPath = "${pwd()}/target/${name}-${version}.tar.gz"
     def outputPath = "${pwd()}/target/${name}-${version}.${type}"
@@ -152,33 +127,15 @@ def execute() {
         unstash 'deb'
         unstash 'tar'
         unstash 'docs'
-        unstash 'confluent-docs'
 
         archiveArtifacts artifacts: "target/${artifactId}-${version}.*"
         archiveArtifacts artifacts: "target/docs/**/*"
         archiveArtifacts artifacts: "target/plugins/packages/*.zip", allowEmptyArchive: true
         archiveArtifacts artifacts: "target/components/packages/*.zip", allowEmptyArchive: true
-        archiveArtifacts artifacts: "target/confluent-docs/**/**", allowEmptyArchive: true
 
         if (env.BRANCH_NAME == 'master') {
-            stage('publish') {
-                if (fileExists('target/plugins/packages')) {
-                    dir('target/plugins/packages') {
-                        def zipFileName = "jcustenborder-${artifactId}-${version}-plugin.zip"
-                        if(fileExists(zipFileName)) {
-                            uploadPlugin(zipFileName, 'jcustenborder', artifactId, version)
-                        }
-                    }
-                }
-                if (fileExists('target/components/packages')) {
-                    dir('target/components/packages') {
-                        def zipFileName = "jcustenborder-${artifactId}-${version}.zip"
-                        if(fileExists(zipFileName)) {
-                            uploadPlugin(zipFileName, 'jcustenborder', artifactId, version)
-                        }
-                    }
-                }
-            }
+            def connectHub = new ConfluentConnectHub(env, steps, true)
+            connectHub.uploadPlugin('jcustenborder', artifactId, version)
         }
     }
 }
