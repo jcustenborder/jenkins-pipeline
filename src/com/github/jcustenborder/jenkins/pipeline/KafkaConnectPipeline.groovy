@@ -127,6 +127,7 @@ def execute() {
         unstash 'deb'
         unstash 'tar'
         unstash 'docs'
+        unstash 'plugin'
 
         archiveArtifacts artifacts: "target/${artifactId}-${version}.*"
         archiveArtifacts artifacts: "target/docs/**/*"
