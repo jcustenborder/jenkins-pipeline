@@ -129,8 +129,7 @@ def execute() {
 
         archiveArtifacts artifacts: "target/${artifactId}-${version}.*"
         archiveArtifacts artifacts: "target/docs/**/*"
-        archiveArtifacts artifacts: "target/plugins/packages/*.zip", allowEmptyArchive: true
-        archiveArtifacts artifacts: "target/components/packages/*.zip", allowEmptyArchive: true
+        archiveArtifacts artifacts: "target/**/*.zip", allowEmptyArchive: true
 
         if (env.BRANCH_NAME == 'master') {
             def connectHub = new ConfluentConnectHub(env, steps, true)

@@ -53,7 +53,7 @@ def execute() {
         archiveArtifacts artifacts: "target/confluent-docs/**/**", allowEmptyArchive: true
 
         if (env.BRANCH_NAME == 'master') {
-            connectHub = new ConfluentConnectHub(env, steps, true)
+            def connectHub = new ConfluentConnectHub(env, steps, true)
             connectHub.uploadPlugin('confluentinc', artifactId, version)
         }
     }
