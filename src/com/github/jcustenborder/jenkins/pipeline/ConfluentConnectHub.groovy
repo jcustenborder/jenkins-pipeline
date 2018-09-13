@@ -37,13 +37,13 @@ class ConfluentConnectHub implements Serializable {
                                 acl: 'Private',
                                 file: "${zipFile.path}",
                                 bucket: "${env.BUCKET}",
-                                path: "${owner}/${artifactId}/${version}/${zipFile.name}"
+                                path: "api/plugins/${owner}/${artifactId}/versions/${version}/${zipFile.name}"
                         )
                         this.steps.s3Upload(
                                 acl: 'Private',
                                 file: "${manifestPath.path}",
                                 bucket: "${env.BUCKET}",
-                                path: "${owner}/${artifactId}/${version}/manifest.json"
+                                path: "api/plugins/${owner}/${artifactId}/versions/${version}/manifest.json"
                         )
                     }
                 }
