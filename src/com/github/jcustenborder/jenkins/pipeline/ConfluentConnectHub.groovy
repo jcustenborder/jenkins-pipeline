@@ -32,7 +32,7 @@ class ConfluentConnectHub implements Serializable {
                 def manifestPath = manifests[0]
 
                 this.steps.withAWS(credentials: 'confluent_aws', region: 'us-west-1') {
-                    this.steps.withCredentials([this.steps.string(credentialsId: 'plugin_staging', variable: 'BUCKET')]) {
+                    this.steps.withCredentials([this.steps.string(credentialsId: 'plugin_production', variable: 'BUCKET')]) {
                         this.steps.s3Upload(
                                 acl: 'Private',
                                 file: "${zipFile.path}",
