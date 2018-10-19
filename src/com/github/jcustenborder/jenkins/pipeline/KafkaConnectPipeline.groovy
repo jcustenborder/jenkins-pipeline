@@ -88,8 +88,8 @@ def execute() {
                         mvn.execute('package')
                     }
                 }
-                echo "Stashing target/${artifactId}-${version}.tar.gz"
-                stash includes: "target/${artifactId}-${version}.tar.gz", name: 'tar'
+                echo "Stashing target/*.tar.gz"
+                stash includes: "target/*.tar.gz", name: 'tar'
                 echo 'Stashing target/docs/**/**'
                 stash includes: 'target/docs/**/**', name: 'docs'
                 echo 'Stashing target/confluent-docs/**/**'
@@ -127,7 +127,9 @@ def execute() {
         unstash 'docs'
         unstash 'plugin'
 
-        archiveArtifacts artifacts: "target/${artifactId}-${version}.*"
+        archiveArtifacts artifacts: "target/*.tar.gz"
+        archiveArtifacts artifacts: "target/*.rpm", allowEmptyArchive: true
+        archiveArtifacts artifacts: "target/*.deb", allowEmptyArchive: true
         archiveArtifacts artifacts: "target/docs/**/*"
         archiveArtifacts artifacts: "target/**/*.zip", allowEmptyArchive: true
 
