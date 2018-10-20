@@ -1,4 +1,4 @@
-def getconnectors() {
+def getConnectors() {
     def result = [
             'kafka-connect-memcached'        : 'jcustenborder/kafka-connect-memcached/master',
             'kafka-connect-redis'            : 'jcustenborder/kafka-connect-redis/master',
