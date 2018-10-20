@@ -88,6 +88,7 @@ def execute() {
                         mvn.execute('package')
                     }
                 }
+                sh "ls -1 target/"
                 echo "Stashing target/*.tar.gz"
                 stash includes: "target/*.tar.gz", name: 'tar'
                 echo 'Stashing target/docs/**/**'
