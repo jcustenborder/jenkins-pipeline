@@ -45,8 +45,13 @@ def execute() {
                             }
 
                             if (env.BRANCH_NAME == 'master') {
-                                sshagent(credentials: ['50a4ec3a-9caf-43d1-bfab-6465b47292da']) {
-                                    sh "git push origin ${version}"
+                                withCredentials([string(credentialsId: 'github_api_token', variable: 'apiToken')]) {
+                                    githubRelease(
+                                            token: apiToken,
+                                            repositoryName: "jcustenborder/${artifactId}",
+                                            tagName: version,
+                                            description: ' '
+                                    )
                                 }
                             }
                         }
