@@ -30,7 +30,6 @@ def execute() {
                             def profiles = null
 
                             if (env.BRANCH_NAME == 'master') {
-                                sh("git tag ${version}")
                                 goals = 'clean deploy'
                                 profiles = 'gpg-signing,maven-central'
                             } else {
@@ -43,15 +42,14 @@ def execute() {
                             } finally {
                                 junit allowEmptyResults: true, testResults: '**/target/surefire-reports/TEST-*.xml'
                             }
-
-                            if (env.BRANCH_NAME == 'master') {
-//                                sshagent(credentials: ['50a4ec3a-9caf-43d1-bfab-6465b47292da']) {
-                                    sh "git push origin ${version}"
-//                                }
-                            }
                         }
                     }
                 }
+            }
+
+            if (env.BRANCH_NAME == 'master') {
+                sh("git tag ${version}")
+                sh "git push origin ${version}"
             }
         }
     }
