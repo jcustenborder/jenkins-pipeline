@@ -45,9 +45,9 @@ def execute() {
                             }
 
                             if (env.BRANCH_NAME == 'master') {
-                                sshagent(credentials: ['50a4ec3a-9caf-43d1-bfab-6465b47292da']) {
+//                                sshagent(credentials: ['50a4ec3a-9caf-43d1-bfab-6465b47292da']) {
                                     sh "git push origin ${version}"
-                                }
+//                                }
                             }
                         }
                     }
