@@ -136,6 +136,10 @@ def execute() {
         if (env.BRANCH_NAME == 'master') {
             def connectHub = new ConfluentConnectHub(env, steps, true)
             connectHub.uploadPlugin('jcustenborder', artifactId, version)
+            sh("git tag ${version}")
+            sshagent(credentials: ['50a4ec3a-9caf-43d1-bfab-6465b47292da']) {
+                sh "git push origin ${version}"
+            }
         }
     }
 }
