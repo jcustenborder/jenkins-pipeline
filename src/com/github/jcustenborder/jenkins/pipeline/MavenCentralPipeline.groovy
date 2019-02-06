@@ -17,6 +17,12 @@ def execute() {
         checkout scm
 
         stage('build') {
+            if (env.BRANCH_NAME == 'master') {
+                sh("git tag ${version}")
+                sshagent(credentials: ['50a4ec3a-9caf-43d1-bfab-6465b47292da']) {
+                    sh "git push origin ${version}"
+                }
+            }
             docker.image(images.jdk8_docker_image).inside("--net host -e DOCKER_HOST='tcp://127.0.0.1:2375'") {
                 withCredentials([file(credentialsId: 'gpg_pubring', variable: 'GPG_PUBRING'), file(credentialsId: 'gpg_secring', variable: 'GPG_SECRING')]) {
                     configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
@@ -44,13 +50,6 @@ def execute() {
                             }
                         }
                     }
-                }
-            }
-
-            if (env.BRANCH_NAME == 'master') {
-                sh("git tag ${version}")
-                sshagent(credentials: ['50a4ec3a-9caf-43d1-bfab-6465b47292da']) {
-                    sh "git push origin ${version}"
                 }
             }
         }
