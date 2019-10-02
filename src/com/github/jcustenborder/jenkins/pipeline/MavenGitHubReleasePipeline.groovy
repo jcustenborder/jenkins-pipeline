@@ -55,6 +55,7 @@ def execute() {
                         githubRelease(
                                 commitish: env.GIT_COMMIT,
                                 token: apiToken,
+                                description: "${version}",
                                 repositoryName: "jcustenborder/${artifactId}",
                                 tagName: version,
                                 includes: "target/${artifactId}-${version}.*",
