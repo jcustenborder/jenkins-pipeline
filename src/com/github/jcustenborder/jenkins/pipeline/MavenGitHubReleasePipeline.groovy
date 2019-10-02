@@ -16,8 +16,10 @@ def execute() {
                 configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
                     withEnv(["JAVA_HOME=${images.jdk8_java_home}", 'DOCKER_HOST=tcp://127.0.0.1:2375']) {
                         def mvn = new MavenUtilities(env, steps, MAVEN_SETTINGS, GPG_PUBRING, GPG_SECRING)
-
                         stage('build') {
+                            version = mvn.changeVersion()
+                            artifactId = mvn.artifactId()
+                            description = mvn.description();
                             try {
                                 mvn.execute('clean test')
                             }
