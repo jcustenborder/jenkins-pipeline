@@ -36,16 +36,19 @@ def execute() {
                         stage('maven package') {
                             mvn.execute('package')
                             sh "ls -1 target/"
-                            echo 'Stashing target/*.tar.gz'
+                            echo 'Stashing target/${artifactId}-${version}.*'
+                            sh "ls -1 target/${artifactId}-${version}.*"
                             stash includes: "target/${artifactId}-${version}.*", name: 'assembly', allowEmpty: false
                         }
                     }
                 }
             }
 
-            if (env.BRANCH_NAME == 'master') {
-                stage('publish') {
-                    unstash 'assembly'
+            stage('publish') {
+                unstash 'assembly'
+                archiveArtifacts artifacts: "target/${artifactId}-${version}.*"
+
+                if (env.BRANCH_NAME == 'master') {
                     withCredentials([string(credentialsId: 'github_api_token', variable: 'apiToken')]) {
                         githubRelease(
                                 commitish: env.GIT_COMMIT,
