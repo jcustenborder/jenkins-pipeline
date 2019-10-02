@@ -23,7 +23,6 @@ def execute() {
         docker.image(images.jdk8_docker_image).inside("--net host -e DOCKER_HOST='tcp://127.0.0.1:2375'") {
             configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
                 withEnv(["JAVA_HOME=${images.jdk8_java_home}", 'DOCKER_HOST=tcp://127.0.0.1:2375']) {
-                    sh 'docker ps'
                     def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
                     artifactId = mvn.artifactId()
                     description = mvn.description();
