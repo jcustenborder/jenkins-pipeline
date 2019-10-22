@@ -11,8 +11,8 @@ class ReleaseNoteGenerator implements Serializable {
 
     def generate() {
         def changelog = this.steps.gitChangelog returnType: 'STRING',
-                from: [type: 'COMMIT', value: "${scm_result.GIT_PREVIOUS_SUCCESSFUL_COMMIT}"],
-                to: [type: 'COMMIT', value: "${scm_result.GIT_COMMIT}"],
+                from: [type: 'COMMIT', value: "${this.scmResult.GIT_PREVIOUS_SUCCESSFUL_COMMIT}"],
+                to: [type: 'COMMIT', value: "${this.scmResult.GIT_COMMIT}"],
                 template: """
 # Changelog
 
