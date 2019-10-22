@@ -46,11 +46,62 @@ def execute() {
                     }
                 }
             }
+
+            def changelog = gitChangelog returnType: 'STRING',
+  from: [type: 'REF', value: "${env.GIT_PREVIOUS_SUCCESSFUL_COMMIT}"],
+  to: [type: 'REF', value: "${env.GIT_COMMIT}"],
+  template: """
+# Changelog
+
+{{#tags}}
+## {{name}}
+ {{#issues}}
+  {{#hasIssue}}
+   {{#hasLink}}
+### {{name}} [{{issue}}]({{link}}) {{title}} {{#hasIssueType}} *{{issueType}}* {{/hasIssueType}} {{#hasLabels}} {{#labels}} *{{.}}* {{/labels}} {{/hasLabels}}
+   {{/hasLink}}
+   {{^hasLink}}
+### {{name}} {{issue}} {{title}} {{#hasIssueType}} *{{issueType}}* {{/hasIssueType}} {{#hasLabels}} {{#labels}} *{{.}}* {{/labels}} {{/hasLabels}}
+   {{/hasLink}}
+  {{/hasIssue}}
+  {{^hasIssue}}
+### {{name}}
+  {{/hasIssue}}
+
+  {{#commits}}
+**{{{messageTitle}}}**
+
+{{#messageBodyItems}}
+ * {{.}} 
+{{/messageBodyItems}}
+
+[{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}) {{authorName}} *{{commitTime}}*
+
+  {{/commits}}
+
+ {{/issues}}
+{{/tags}}
+ """
+
+            echo "${changelog}"
+
+
             if (env.BRANCH_NAME == 'master') {
-                sh("git tag ${version}")
-                sshagent(credentials: ['50a4ec3a-9caf-43d1-bfab-6465b47292da']) {
-                    sh "git push origin ${version}"
+
+                withCredentials([string(credentialsId: 'github_api_token', variable: 'apiToken')]) {
+                    githubRelease(
+                            commitish: env.GIT_COMMIT,
+                            token: apiToken,
+                            description: "${version}",
+                            repositoryName: "jcustenborder/${artifactId}",
+                            tagName: version
+//                            includes: "target/${artifactId}-${version}.*",
+//                            excludes: 'target/*.jar'
+                    )
                 }
+//                sshagent(credentials: ['50a4ec3a-9caf-43d1-bfab-6465b47292da']) {
+//                    sh "git push origin ${version}"
+//                }
             }
         }
     }
