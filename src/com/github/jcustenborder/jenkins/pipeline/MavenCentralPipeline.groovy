@@ -19,8 +19,8 @@ def execute() {
         echo "Generating changelog from '${scm_result.GIT_PREVIOUS_SUCCESSFUL_COMMIT}' to '${scm_result.GIT_COMMIT}'"
 
         def changelog = gitChangelog returnType: 'STRING',
-                from: [type: 'REF', value: "${env.GIT_PREVIOUS_SUCCESSFUL_COMMIT}"],
-                to: [type: 'REF', value: "${env.GIT_COMMIT}"],
+                from: [type: 'REF', value: "${scm_result.GIT_PREVIOUS_SUCCESSFUL_COMMIT}"],
+                to: [type: 'REF', value: "${scm_result.GIT_COMMIT}"],
                 template: """
 # Changelog
 
