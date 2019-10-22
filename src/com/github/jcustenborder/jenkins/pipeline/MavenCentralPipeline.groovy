@@ -16,7 +16,7 @@ def execute() {
         deleteDir()
         checkout scm
 
-        echo "Generating changelog from '${GIT_PREVIOUS_SUCCESSFUL_COMMIT}' to '${GIT_COMMIT}'"
+        echo "Generating changelog from '${env.GIT_PREVIOUS_SUCCESSFUL_COMMIT}' to '${env.GIT_COMMIT}'"
 
         def changelog = gitChangelog returnType: 'STRING',
                 from: [type: 'REF', value: "${env.GIT_PREVIOUS_SUCCESSFUL_COMMIT}"],
