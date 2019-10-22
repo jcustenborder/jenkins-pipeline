@@ -14,9 +14,9 @@ def execute() {
 
     node {
         deleteDir()
-        checkout scm
+        def scm_result = checkout(scm)
 
-        echo "Generating changelog from '${env.GIT_PREVIOUS_SUCCESSFUL_COMMIT}' to '${env.GIT_COMMIT}'"
+        echo "Generating changelog from '${scm_result.GIT_PREVIOUS_SUCCESSFUL_COMMIT}' to '${scm_result.GIT_COMMIT}'"
 
         def changelog = gitChangelog returnType: 'STRING',
                 from: [type: 'REF', value: "${env.GIT_PREVIOUS_SUCCESSFUL_COMMIT}"],
