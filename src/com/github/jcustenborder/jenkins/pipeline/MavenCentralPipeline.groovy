@@ -16,41 +16,12 @@ def execute() {
         deleteDir()
         checkout scm
 
-        stage('build') {
-            docker.image(images.jdk8_docker_image).inside("--net host -e DOCKER_HOST='tcp://127.0.0.1:2375'") {
-                withCredentials([file(credentialsId: 'gpg_pubring', variable: 'GPG_PUBRING'), file(credentialsId: 'gpg_secring', variable: 'GPG_SECRING')]) {
-                    configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
-                        withEnv(["JAVA_HOME=${images.jdk8_java_home}", 'DOCKER_HOST=tcp://127.0.0.1:2375']) {
-                            def mvn = new MavenUtilities(env, steps, MAVEN_SETTINGS, GPG_PUBRING, GPG_SECRING)
-                            version = mvn.changeVersion()
-                            artifactId = mvn.artifactId()
-                            description = mvn.description();
+        echo "Generating changelog from '${env.GIT_PREVIOUS_SUCCESSFUL_COMMIT}' to '${env.GIT_COMMIT}'"
 
-                            def goals
-                            def profiles = null
-
-                            if (env.BRANCH_NAME == 'master') {
-                                goals = 'clean deploy'
-                                profiles = 'gpg-signing,maven-central'
-                            } else {
-                                goals = 'clean verify'
-                            }
-
-                            url = mvn.url()
-                            try {
-                                mvn.execute(goals, profiles)
-                            } finally {
-                                junit allowEmptyResults: true, testResults: '**/target/surefire-reports/TEST-*.xml'
-                            }
-                        }
-                    }
-                }
-            }
-
-            def changelog = gitChangelog returnType: 'STRING',
-  from: [type: 'REF', value: "${env.GIT_PREVIOUS_SUCCESSFUL_COMMIT}"],
-  to: [type: 'REF', value: "${env.GIT_COMMIT}"],
-  template: """
+        def changelog = gitChangelog returnType: 'STRING',
+                from: [type: 'REF', value: "${env.GIT_PREVIOUS_SUCCESSFUL_COMMIT}"],
+                to: [type: 'REF', value: "${env.GIT_COMMIT}"],
+                template: """
 # Changelog
 
 {{#tags}}
@@ -83,8 +54,38 @@ def execute() {
 {{/tags}}
  """
 
-            echo "${changelog}"
+        echo "${changelog}"
 
+        stage('build') {
+            docker.image(images.jdk8_docker_image).inside("--net host -e DOCKER_HOST='tcp://127.0.0.1:2375'") {
+                withCredentials([file(credentialsId: 'gpg_pubring', variable: 'GPG_PUBRING'), file(credentialsId: 'gpg_secring', variable: 'GPG_SECRING')]) {
+                    configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
+                        withEnv(["JAVA_HOME=${images.jdk8_java_home}", 'DOCKER_HOST=tcp://127.0.0.1:2375']) {
+                            def mvn = new MavenUtilities(env, steps, MAVEN_SETTINGS, GPG_PUBRING, GPG_SECRING)
+                            version = mvn.changeVersion()
+                            artifactId = mvn.artifactId()
+                            description = mvn.description();
+
+                            def goals
+                            def profiles = null
+
+                            if (env.BRANCH_NAME == 'master') {
+                                goals = 'clean deploy'
+                                profiles = 'gpg-signing,maven-central'
+                            } else {
+                                goals = 'clean verify'
+                            }
+
+                            url = mvn.url()
+                            try {
+                                mvn.execute(goals, profiles)
+                            } finally {
+                                junit allowEmptyResults: true, testResults: '**/target/surefire-reports/TEST-*.xml'
+                            }
+                        }
+                    }
+                }
+            }
 
             if (env.BRANCH_NAME == 'master') {
 
