@@ -14,11 +14,8 @@ def execute() {
 
     node {
         deleteDir()
-        def scm_result = checkout(scm)
-
-        echo "Generating changelog from '${scm_result.GIT_PREVIOUS_SUCCESSFUL_COMMIT}' to '${scm_result.GIT_COMMIT}'"
-
-        def changelogGenerator = new ReleaseNoteGenerator(scm_result, steps)
+        def scmResult = checkout(scm)
+        def changelogGenerator = new ReleaseNoteGenerator(scmResult, steps)
 
         def changelog = changelogGenerator.generate()
 
