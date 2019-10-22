@@ -18,43 +18,10 @@ def execute() {
 
         echo "Generating changelog from '${scm_result.GIT_PREVIOUS_SUCCESSFUL_COMMIT}' to '${scm_result.GIT_COMMIT}'"
 
-        def changelog = gitChangelog returnType: 'STRING',
-                from: [type: 'COMMIT', value: "${scm_result.GIT_PREVIOUS_SUCCESSFUL_COMMIT}"],
-                to: [type: 'COMMIT', value: "${scm_result.GIT_COMMIT}"],
-                template: """
-# Changelog
+        def changelogGenerator = new ReleaseNoteGenerator(scm_result, steps)
 
-{{#tags}}
-## {{name}}
- {{#issues}}
-  {{#hasIssue}}
-   {{#hasLink}}
-### {{name}} [{{issue}}]({{link}}) {{title}} {{#hasIssueType}} *{{issueType}}* {{/hasIssueType}} {{#hasLabels}} {{#labels}} *{{.}}* {{/labels}} {{/hasLabels}}
-   {{/hasLink}}
-   {{^hasLink}}
-### {{name}} {{issue}} {{title}} {{#hasIssueType}} *{{issueType}}* {{/hasIssueType}} {{#hasLabels}} {{#labels}} *{{.}}* {{/labels}} {{/hasLabels}}
-   {{/hasLink}}
-  {{/hasIssue}}
-  {{^hasIssue}}
-### {{name}}
-  {{/hasIssue}}
+        def changelog = changelogGenerator.generate()
 
-  {{#commits}}
-**{{{messageTitle}}}**
-
-{{#messageBodyItems}}
- * {{.}} 
-{{/messageBodyItems}}
-
-[{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}}) {{authorName}} *{{commitTime}}*
-
-  {{/commits}}
-
- {{/issues}}
-{{/tags}}
- """
-
-        echo "${changelog}"
 
         stage('build') {
             docker.image(images.jdk8_docker_image).inside("--net host -e DOCKER_HOST='tcp://127.0.0.1:2375'") {
