@@ -8,8 +8,7 @@ def execute() {
 
     node {
         deleteDir()
-        checkout scm
-
+        def scmResult = checkout(scm)
 
         docker.image(images.jdk8_docker_image).inside("--net host -e DOCKER_HOST='tcp://127.0.0.1:2375'") {
             withCredentials([file(credentialsId: 'gpg_pubring', variable: 'GPG_PUBRING'), file(credentialsId: 'gpg_secring', variable: 'GPG_SECRING')]) {
@@ -45,23 +44,25 @@ def execute() {
                     }
                 }
             }
+        }
 
-            stage('publish') {
-                unstash 'assembly'
-                archiveArtifacts artifacts: "target/${artifactId}-${version}.*"
+        stage('publish') {
+            unstash 'assembly'
+            archiveArtifacts artifacts: "target/${artifactId}-${version}.*"
 
-                if (env.BRANCH_NAME == 'master') {
-                    withCredentials([string(credentialsId: 'github_api_token', variable: 'apiToken')]) {
-                        githubRelease(
-                                commitish: env.GIT_COMMIT,
-                                token: apiToken,
-                                description: "${version}",
-                                repositoryName: "jcustenborder/${artifactId}",
-                                tagName: version,
-                                includes: "target/${artifactId}-${version}.*",
-                                excludes: 'target/*.jar'
-                        )
-                    }
+            if (env.BRANCH_NAME == 'master') {
+                def changelogGenerator = new ReleaseNoteGenerator(scmResult, steps)
+                def changelog = changelogGenerator.generate()
+                withCredentials([string(credentialsId: 'github_api_token', variable: 'apiToken')]) {
+                    githubRelease(
+                            commitish: scmResult.GIT_COMMIT,
+                            token: apiToken,
+                            description: "${changelog}",
+                            repositoryName: "jcustenborder/${artifactId}",
+                            tagName: version,
+                            includes: "target/${artifactId}-${version}.*",
+                            excludes: 'target/*.jar'
+                    )
                 }
             }
         }
