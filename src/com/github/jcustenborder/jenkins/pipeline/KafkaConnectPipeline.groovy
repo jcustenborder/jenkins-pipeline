@@ -73,7 +73,9 @@ def execute() {
                         token: apiToken,
                         description: "${changelog}",
                         repositoryName: "jcustenborder/${artifactId}",
-                        tagName: version
+                        tagName: version,
+                        includes: "target/${artifactId}-${version}.*",
+                        excludes: 'target/*'
                 )
             }
 
