@@ -15,10 +15,6 @@ def execute() {
     node {
         deleteDir()
         def scmResult = checkout(scm)
-        def changelogGenerator = new ReleaseNoteGenerator(scmResult, steps)
-
-        def changelog = changelogGenerator.generate()
-
 
         stage('build') {
             docker.image(images.jdk8_docker_image).inside("--net host -e DOCKER_HOST='tcp://127.0.0.1:2375'") {
@@ -52,21 +48,19 @@ def execute() {
             }
 
             if (env.BRANCH_NAME == 'master') {
-
+                def changelogGenerator = new ReleaseNoteGenerator(scmResult, steps)
+                def changelog = changelogGenerator.generate()
                 withCredentials([string(credentialsId: 'github_api_token', variable: 'apiToken')]) {
                     githubRelease(
-                            commitish: env.GIT_COMMIT,
+                            commitish: scmResult.GIT_COMMIT,
                             token: apiToken,
-                            description: "${version}",
+                            description: "${changelog}",
                             repositoryName: "jcustenborder/${artifactId}",
-                            tagName: version
-//                            includes: "target/${artifactId}-${version}.*",
-//                            excludes: 'target/*.jar'
+                            tagName: version,
+                            includes: "target/${artifactId}-${version}.*",
+                            excludes: 'target/*.jar'
                     )
                 }
-//                sshagent(credentials: ['50a4ec3a-9caf-43d1-bfab-6465b47292da']) {
-//                    sh "git push origin ${version}"
-//                }
             }
         }
     }

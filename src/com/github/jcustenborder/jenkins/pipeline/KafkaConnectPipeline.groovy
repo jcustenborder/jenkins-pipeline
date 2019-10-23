@@ -68,12 +68,20 @@ def execute() {
         archiveArtifacts artifacts: "target/**/*.zip", allowEmptyArchive: true
 
         if (env.BRANCH_NAME == 'master') {
+            def changelogGenerator = new ReleaseNoteGenerator(scmResult, steps)
+            def changelog = changelogGenerator.generate()
+            withCredentials([string(credentialsId: 'github_api_token', variable: 'apiToken')]) {
+                githubRelease(
+                        commitish: scmResult.GIT_COMMIT,
+                        token: apiToken,
+                        description: "${changelog}",
+                        repositoryName: "jcustenborder/${artifactId}",
+                        tagName: version
+                )
+            }
+
             def connectHub = new ConfluentConnectHub(env, steps, true)
             connectHub.uploadPlugin('jcustenborder', artifactId, version)
-            sh("git tag ${version}")
-            sshagent(credentials: ['50a4ec3a-9caf-43d1-bfab-6465b47292da']) {
-                sh "git push origin ${version}"
-            }
         }
     }
 }
