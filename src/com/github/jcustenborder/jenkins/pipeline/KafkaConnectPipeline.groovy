@@ -13,9 +13,9 @@ def execute() {
     def artifactId
     def description
     def url
-
+    def scmResult
     node {
-        def scmResult
+
         stage('checkout') {
             deleteDir()
             scmResult = checkout(scm)
