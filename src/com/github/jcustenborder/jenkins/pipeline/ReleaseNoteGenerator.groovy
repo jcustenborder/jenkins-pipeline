@@ -13,9 +13,9 @@ class ReleaseNoteGenerator implements Serializable {
         def from = "0000000000000000000000000000000000000000"
         def to = "${this.scmResult.GIT_COMMIT}"
 
-        if ("" != "${this.scmResult.GIT_PREVIOUS_SUCCESSFUL_COMMIT}") {
-            from = "${this.scmResult.GIT_PREVIOUS_SUCCESSFUL_COMMIT}"
-        }
+//        if ("" != "${this.scmResult.GIT_PREVIOUS_SUCCESSFUL_COMMIT}") {
+//            from = "${this.scmResult.GIT_PREVIOUS_SUCCESSFUL_COMMIT}"
+//        }
 
         def changelog = this.steps.gitChangelog returnType: 'STRING',
                 from: [type: 'COMMIT', value: "${from}"],
