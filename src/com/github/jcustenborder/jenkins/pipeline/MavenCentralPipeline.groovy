@@ -15,9 +15,7 @@ def execute() {
     node {
         deleteDir()
         def scmResult = checkout(scm)
-        echo "GIT_URL is ${scmResult.GIT_URL}"
-        def repoUri = new java.net.URI(scmResult.GIT_URL)
-        def repositoryName = repoUri.getPath().substring(1)
+        def repositoryName = scmResult.GIT_URL.replaceAll('^.+:(.+)\\.git$', '$1')
 
         stage('build') {
             docker.image(images.jdk8_docker_image).inside("--net host -e DOCKER_HOST='tcp://127.0.0.1:2375'") {
