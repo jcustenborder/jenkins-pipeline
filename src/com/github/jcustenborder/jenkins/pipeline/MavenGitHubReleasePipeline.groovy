@@ -4,7 +4,7 @@ def execute() {
     def version
     def artifactId
     def description
-
+    def repositoryName = scmResult.GIT_URL.replaceAll('^.+:(.+)\\.git$', '$1')
 
     node {
         deleteDir()
@@ -58,7 +58,7 @@ def execute() {
                             commitish: scmResult.GIT_COMMIT,
                             token: apiToken,
                             description: "${changelog}",
-                            repositoryName: "jcustenborder/${artifactId}",
+                            repositoryName: repositoryName,
                             tagName: version,
                             includes: "target/${artifactId}-${version}.*",
                             excludes: 'target/*.jar'

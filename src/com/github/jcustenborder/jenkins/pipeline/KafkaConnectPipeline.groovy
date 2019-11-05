@@ -14,6 +14,7 @@ def execute() {
     def description
     def url
     def scmResult
+    def repositoryName = scmResult.GIT_URL.replaceAll('^.+:(.+)\\.git$', '$1')
     node {
 
         stage('checkout') {
@@ -72,7 +73,7 @@ def execute() {
                         commitish: scmResult.GIT_COMMIT,
                         token: apiToken,
                         description: "${changelog}",
-                        repositoryName: "jcustenborder/${artifactId}",
+                        repositoryName: repositoryName,
                         tagName: version,
                         includes: "target/${artifactId}-${version}.*",
                         excludes: 'target/*'
