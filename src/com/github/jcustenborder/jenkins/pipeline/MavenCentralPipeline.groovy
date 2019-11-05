@@ -16,6 +16,8 @@ def execute() {
         deleteDir()
         def scmResult = checkout(scm)
         echo "GIT_URL is ${scmResult.GIT_URL}"
+        def repoUri = new java.net.URI(scmResult.GIT_URL)
+        def repositoryName = repoUri.getPath().substring(1)
 
         stage('build') {
             docker.image(images.jdk8_docker_image).inside("--net host -e DOCKER_HOST='tcp://127.0.0.1:2375'") {
@@ -58,7 +60,7 @@ def execute() {
                             commitish: scmResult.GIT_COMMIT,
                             token: apiToken,
                             description: "${changelog}",
-                            repositoryName: "jcustenborder/${artifactId}",
+                            repositoryName: repositoryName,
                             tagName: version,
                             includes: "target/${artifactId}-${version}.*",
                             excludes: 'target/*'
