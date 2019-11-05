@@ -15,6 +15,7 @@ def execute() {
     node {
         deleteDir()
         def scmResult = checkout(scm)
+        echo "GIT_URL is ${scmResult.GIT_URL}"
 
         stage('build') {
             docker.image(images.jdk8_docker_image).inside("--net host -e DOCKER_HOST='tcp://127.0.0.1:2375'") {
@@ -50,6 +51,8 @@ def execute() {
             if (env.BRANCH_NAME == 'master') {
                 def changelogGenerator = new ReleaseNoteGenerator(scmResult, steps)
                 def changelog = changelogGenerator.generate()
+
+
                 withCredentials([string(credentialsId: 'github_api_token', variable: 'apiToken')]) {
                     githubRelease(
                             commitish: scmResult.GIT_COMMIT,
