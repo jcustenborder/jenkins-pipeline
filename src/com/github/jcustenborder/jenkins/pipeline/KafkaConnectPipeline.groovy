@@ -14,14 +14,15 @@ def execute() {
     def description
     def url
     def scmResult
-    def repositoryName = scmResult.GIT_URL.replaceAll('^.+:(.+)\\.git$', '$1')
+    
     node {
 
         stage('checkout') {
             deleteDir()
             scmResult = checkout(scm)
         }
-
+        def repositoryName = scmResult.GIT_URL.replaceAll('^.+:(.+)\\.git$', '$1')
+            
         docker.image(images.jdk8_docker_image).inside("--net host -e DOCKER_HOST='tcp://127.0.0.1:2375'") {
             configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
                 withEnv(["JAVA_HOME=${images.jdk8_java_home}", 'DOCKER_HOST=tcp://127.0.0.1:2375']) {
