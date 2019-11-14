@@ -58,9 +58,7 @@ def execute() {
                 }
             }
         }
-    }
-
-    node {
+            
         unstash 'docs'
         unstash 'plugin'
         archiveArtifacts artifacts: "target/docs/**/*"
