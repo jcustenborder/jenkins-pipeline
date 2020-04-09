@@ -48,7 +48,7 @@ def execute() {
                 }
             }
 
-            def changelogGenerator = new ReleaseNoteGenerator(env, steps)
+            def changelogGenerator = new ReleaseNoteGenerator(scmResult, steps)
             def changelog = changelogGenerator.generate()
 
             writeFile file: "target/RELEASENOTES.md", text: changelog

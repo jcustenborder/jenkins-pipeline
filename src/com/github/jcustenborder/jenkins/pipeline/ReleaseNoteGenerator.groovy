@@ -1,17 +1,17 @@
 package com.github.jcustenborder.jenkins.pipeline
 
 class ReleaseNoteGenerator implements Serializable {
-    def env
+    def scmResult
     def steps
 
-    ReleaseNoteGenerator(env, steps) {
-        this.env = env
+    ReleaseNoteGenerator(scmResult, steps) {
+        this.scmResult = scmResult
         this.steps = steps
     }
 
     def generate() {
-        def from = "${this.env.GIT_PREVIOUS_SUCCESSFUL_COMMIT}"
-        def to = "${this.env.GIT_COMMIT}"
+        def from = "${this.scmResult.GIT_PREVIOUS_SUCCESSFUL_COMMIT}"
+        def to = "${this.scmResult.GIT_COMMIT}"
         if ("".equals(from)) {
             from = "0000000000000000000000000000000000000000"
         }

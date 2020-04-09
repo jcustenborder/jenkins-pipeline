@@ -64,7 +64,7 @@ def execute() {
         archiveArtifacts artifacts: "target/docs/**/*"
         archiveArtifacts artifacts: "target/**/*.zip", allowEmptyArchive: true
 
-        def changelogGenerator = new ReleaseNoteGenerator(env, steps)
+        def changelogGenerator = new ReleaseNoteGenerator(scmResult, steps)
         def changelog = changelogGenerator.generate()
 
         writeFile file: "target/RELEASENOTES.md", text: changelog
