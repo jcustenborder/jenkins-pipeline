@@ -16,7 +16,9 @@ class ReleaseNoteGenerator implements Serializable {
         if ("".equals("${this.scmResult.GIT_PREVIOUS_SUCCESSFUL_COMMIT}")) {
             from = "${this.scmResult.GIT_PREVIOUS_SUCCESSFUL_COMMIT}"
         }
-
+        
+        this.steps.echo "Generating Change Log from:${from} to:${to}"
+        
         def changelog = this.steps.gitChangelog returnType: 'STRING',
                 from: [type: 'COMMIT', value: "${from}"],
                 to: [type: 'COMMIT', value: "${to}"],
