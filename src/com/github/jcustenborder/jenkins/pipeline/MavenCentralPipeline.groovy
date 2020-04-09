@@ -48,11 +48,13 @@ def execute() {
                 }
             }
 
+            def changelogGenerator = new ReleaseNoteGenerator(env, steps)
+            def changelog = changelogGenerator.generate()
+
+            writeFile file: "target/RELEASENOTES.md", text: changelog
+            archiveArtifacts artifacts: "target/RELEASENOTES.md", allowEmptyArchive: true
+
             if (env.BRANCH_NAME == 'master') {
-                def changelogGenerator = new ReleaseNoteGenerator(scmResult, steps)
-                def changelog = changelogGenerator.generate()
-
-
                 withCredentials([string(credentialsId: 'github_api_token', variable: 'apiToken')]) {
                     githubRelease(
                             commitish: scmResult.GIT_COMMIT,
