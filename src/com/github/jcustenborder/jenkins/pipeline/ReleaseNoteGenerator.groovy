@@ -15,14 +15,12 @@ class ReleaseNoteGenerator implements Serializable {
         if ("".equals(from)) {
             from = "0000000000000000000000000000000000000000"
         }
-        this.steps.sh "export"
         this.steps.echo "Generating Change Log from:${from} to:${to}"
         
         def changelog = this.steps.gitChangelog returnType: 'STRING',
                 from: [type: 'COMMIT', value: "${from}"],
                 to: [type: 'COMMIT', value: "${to}"],
-                template: """
-# Changelog
+                template: """# Changelog
 
 {{#tags}}
 ## {{name}}
