@@ -68,7 +68,8 @@ def execute() {
                             token: apiToken,
                             description: "${changelog}",
                             repositoryName: repositoryName,
-                            tagName: version
+                            tagName: version,
+                            includes: "target/RELEASENOTES.md"
                     )
                 }
             }
