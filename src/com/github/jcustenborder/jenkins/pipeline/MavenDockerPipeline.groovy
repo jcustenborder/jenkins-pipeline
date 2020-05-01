@@ -39,7 +39,8 @@ def execute() {
                             }
                         }
                         stage('maven package') {
-                            mvn.execute('package')
+                            def profiles = env.BRANCH_NAME == 'master' ? 'docker-release':'docker-snapshot'
+                            mvn.execute('package', profiles)
                             sh "ls -1 target/"
                             echo 'Stashing target/${artifactId}-${version}.*'
                             sh "ls -1 target/${artifactId}-${version}.*"
