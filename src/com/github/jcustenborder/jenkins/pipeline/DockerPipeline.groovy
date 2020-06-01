@@ -24,6 +24,8 @@ def execute() {
             tagArgument+=" -t '${tag}'"
         }
 
-        sh "docker build . ${tagArgument}"
+        stage('build') {
+            sh "docker build . ${tagArgument}"
+        }
     }
 }
