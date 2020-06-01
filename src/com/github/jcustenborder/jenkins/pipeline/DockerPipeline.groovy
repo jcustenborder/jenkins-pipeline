@@ -33,7 +33,7 @@ def execute() {
             versions.add("latest")
             versions.add("${majorVersion}.${minorVersion}.${env.BUILD_NUMBER}")
         } else {
-            versions.add("${imageName}:${env.BRANCH_NAME}-${env.BUILD_NUMBER}")
+            versions.add("${env.BRANCH_NAME}-${env.BUILD_NUMBER}")
         }
 
 
