@@ -39,10 +39,12 @@ def execute() {
 
         stage('build') {
             repositories.each { repository ->
+                def repositoryUrl = repository['registry']
+                def uri = new java.net.URI(repositoryUrl);
                 //['credential': 'custenborder_docker', 'registry': 'https://docker.custenborder.com', 'repository': 'jcustenborder']
-                withDockerRegistry(url: "docker.custenborder.com", credentialsId: repository['credential']) {
+                withDockerRegistry(url: repositoryUrl, credentialsId: repository['credential']) {
                     versions.each { version ->
-                        def image = docker.build("docker.custenborder.com/${repository['repository']}/${imageName}:${version}")
+                        def image = docker.build("${uri.getHost()}/${repository['repository']}/${imageName}:${version}")
                         image.push()
                     }
                 }
