@@ -40,12 +40,10 @@ def execute() {
         stage('build') {
             repositories.each { repository ->
                 //['credential': 'custenborder_docker', 'registry': 'https://docker.custenborder.com', 'repository': 'jcustenborder']
-                withDockerRegistry(url: repository['registry'], credentialsId: repository['credential']) {
+                withDockerRegistry(url: "docker.custenborder.com", credentialsId: repository['credential']) {
                     versions.each { version ->
-
-                        def image = docker.build("${repository['repository']}/${imageName}:${version}")
+                        def image = docker.build("docker.custenborder.com/${repository['repository']}/${imageName}:${version}")
                         image.push()
-
                     }
                 }
             }
