@@ -27,7 +27,7 @@ def execute() {
             deleteDir()
             scmResult = checkout(scm)
         }
-
+        def repositoryName = scmResult.GIT_URL.replaceAll('^.+:(.+)\\.git$', '$1')
         def versions = []
         if (env.BRANCH_NAME == 'master') {
             versions.add("latest")
