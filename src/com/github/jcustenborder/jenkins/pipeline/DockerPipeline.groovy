@@ -27,5 +27,11 @@ def execute() {
         stage('build') {
             sh "docker build . ${tagArgument}"
         }
+
+        stage('push') {
+            tags.each { tag ->
+                sh "docker push '${tag}'"
+            }
+        }
     }
 }
