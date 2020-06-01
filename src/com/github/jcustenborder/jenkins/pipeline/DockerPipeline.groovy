@@ -1,6 +1,21 @@
 package com.github.jcustenborder.jenkins.pipeline
 
+def imageName = null;
+def majorVersion = null;
+def minorVersion = null;
+
+
 def execute() {
+    if(null == imageName) {
+        error("imageName must be set.")
+    }
+    if(null == majorVersion) {
+        error("imageName must be set.")
+    }
+    if(null == minorVersion) {
+        error("imageName must be set.")
+    }
+
     def scmResult
 
     node() {
@@ -9,19 +24,18 @@ def execute() {
             scmResult = checkout(scm)
         }
 
-        imageSettings = readYaml(file: 'image.yml')
-
-        def tags=[]
+        def tags = []
 
         if (env.BRANCH_NAME == 'master') {
-            tags.add("${imageSettings['name']}:latest")
+            tags.add("${imageName}:latest")
+            tags.add("${majorVersion}.${minorVersion}.${env.BUILD_NUMBER}")
         } else {
-            tags.add("${imageSettings['name']}:${env.BRANCH_NAME}-${env.BUILD_NUMBER}")
+            tags.add("${imageName}:${env.BRANCH_NAME}-${env.BUILD_NUMBER}")
         }
 
-        def tagArgument=''
-        tags.each { tag->
-            tagArgument+=" -t '${tag}'"
+        def tagArgument = ''
+        tags.each { tag ->
+            tagArgument += " -t '${tag}'"
         }
 
         stage('build') {
