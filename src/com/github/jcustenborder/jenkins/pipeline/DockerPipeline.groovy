@@ -3,17 +3,21 @@ package com.github.jcustenborder.jenkins.pipeline
 def imageName = null;
 def majorVersion = null;
 def minorVersion = null;
+def repositories = null;
 
 
 def execute() {
-    if(null == imageName) {
+    if (null == imageName) {
         error("imageName must be set.")
     }
-    if(null == majorVersion) {
-        error("imageName must be set.")
+    if (null == majorVersion) {
+        error("majorVersion must be set.")
     }
-    if(null == minorVersion) {
-        error("imageName must be set.")
+    if (null == minorVersion) {
+        error("minorVersion must be set.")
+    }
+    if (null == repositories) {
+        error("repositories must be set.")
     }
 
     def scmResult
@@ -24,13 +28,32 @@ def execute() {
             scmResult = checkout(scm)
         }
 
+        def tagsToPush = []
         def tags = []
 
         if (env.BRANCH_NAME == 'master') {
-            tags.add("${imageName}:latest")
-            tags.add("${majorVersion}.${minorVersion}.${env.BUILD_NUMBER}")
+            repositories.each { credential, repository ->
+                mytags = [
+                        "${repository}/${imageName}:latest",
+                        "${repository}/${majorVersion}.${minorVersion}.${env.BUILD_NUMBER}"
+                ]
+                if (!tagsToPush.containsKey(credential)) {
+                    tagsToPush[credential] = mytags
+                } else {
+                    tagsToPush[credential].addAll(mytags);
+                }
+            }
         } else {
-            tags.add("${imageName}:${env.BRANCH_NAME}-${env.BUILD_NUMBER}")
+            repositories.each { credential, repository ->
+                mytags = [
+                        "${repository}/${imageName}:${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
+                ]
+                if (!tagsToPush.containsKey(credential)) {
+                    tagsToPush[credential] = mytags
+                } else {
+                    tagsToPush[credential].addAll(mytags);
+                }
+            }
         }
 
         def tagArgument = ''
@@ -39,10 +62,13 @@ def execute() {
         }
 
         stage('build') {
-            sh "docker build . ${tagArgument}"
+            docker.build "${tagArgument}"
         }
 
         stage('push') {
+            tagsToPush.each {credential, tag ->
+                wi
+            }
             tags.each { tag ->
                 sh "docker push '${tag}'"
             }
