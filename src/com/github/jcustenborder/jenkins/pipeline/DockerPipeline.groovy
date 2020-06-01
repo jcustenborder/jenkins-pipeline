@@ -29,6 +29,7 @@ def execute() {
         }
         def repositoryName = scmResult.GIT_URL.replaceAll('^.+:(.+)\\.git$', '$1')
         def versions = []
+        def version = "${majorVersion}.${minorVersion}.${env.BUILD_NUMBER}"
         if (env.BRANCH_NAME == 'master') {
             versions.add("latest")
             versions.add("${majorVersion}.${minorVersion}.${env.BUILD_NUMBER}")
