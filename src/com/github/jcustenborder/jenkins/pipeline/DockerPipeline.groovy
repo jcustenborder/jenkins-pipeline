@@ -28,49 +28,26 @@ def execute() {
             scmResult = checkout(scm)
         }
 
-        def tagsToPush = []
-        def tags = []
-
+        def versions = []
         if (env.BRANCH_NAME == 'master') {
-            repositories.each { credential, repository ->
-                mytags = [
-                        "${repository}/${imageName}:latest",
-                        "${repository}/${majorVersion}.${minorVersion}.${env.BUILD_NUMBER}"
-                ]
-                if (!tagsToPush.containsKey(credential)) {
-                    tagsToPush[credential] = mytags
-                } else {
-                    tagsToPush[credential].addAll(mytags);
-                }
-            }
+            versions.add("latest")
+            versions.add("${majorVersion}.${minorVersion}.${env.BUILD_NUMBER}")
         } else {
-            repositories.each { credential, repository ->
-                mytags = [
-                        "${repository}/${imageName}:${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
-                ]
-                if (!tagsToPush.containsKey(credential)) {
-                    tagsToPush[credential] = mytags
-                } else {
-                    tagsToPush[credential].addAll(mytags);
-                }
-            }
+            versions.add("${imageName}:${env.BRANCH_NAME}-${env.BUILD_NUMBER}")
         }
 
-        def tagArgument = ''
-        tags.each { tag ->
-            tagArgument += " -t '${tag}'"
-        }
 
         stage('build') {
-            docker.build "${tagArgument}"
-        }
+            repositories.each { repository ->
+                //['credential': 'custenborder_docker', 'registry': 'https://docker.custenborder.com', 'repository': 'jcustenborder']
+                withDockerRegistry(repository['registry'], repository['credential']) {
+                    versions.each { version ->
 
-        stage('push') {
-            tagsToPush.each {credential, tag ->
-                wi
-            }
-            tags.each { tag ->
-                sh "docker push '${tag}'"
+                        def image = docker.build("${repository['repository']}/${imageName}:${version}")
+                        image.push()
+
+                    }
+                }
             }
         }
     }
