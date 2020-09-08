@@ -18,40 +18,42 @@ def execute() {
         def repositoryName = scmResult.GIT_URL.replaceAll('^.+:(.+)\\.git$', '$1')
 
         stage('build') {
-            docker.image(images.jdk8_docker_image).inside("--net host -e DOCKER_HOST='tcp://127.0.0.1:2375'") {
-                withCredentials([file(credentialsId: 'gpg_pubring', variable: 'GPG_PUBRING'), file(credentialsId: 'gpg_secring', variable: 'GPG_SECRING')]) {
-                    configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
-                        withEnv(["JAVA_HOME=${images.jdk8_java_home}", 'DOCKER_HOST=tcp://127.0.0.1:2375']) {
-                            def mvn = new MavenUtilities(env, steps, MAVEN_SETTINGS, GPG_PUBRING, GPG_SECRING)
-                            version = mvn.changeVersion()
-                            artifactId = mvn.artifactId()
-                            description = mvn.description();
+            withDockerRegistry(credentialsId: 'custenborder_docker', url: 'https://docker.custenborder.com') {
+                docker.image(images.jdk11_docker_image).inside("--net host -e DOCKER_HOST='tcp://127.0.0.1:2375'") {
+                    withCredentials([file(credentialsId: 'gpg_pubring', variable: 'GPG_PUBRING'), file(credentialsId: 'gpg_secring', variable: 'GPG_SECRING')]) {
+                        configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
+                            withEnv(["JAVA_HOME=${images.jdk8_java_home}", 'DOCKER_HOST=tcp://127.0.0.1:2375']) {
+                                def mvn = new MavenUtilities(env, steps, MAVEN_SETTINGS, GPG_PUBRING, GPG_SECRING)
+                                version = mvn.changeVersion()
+                                artifactId = mvn.artifactId()
+                                description = mvn.description();
 
-                            def goals
-                            def profiles = null
+                                def goals
+                                def profiles = null
 
-                            if (env.BRANCH_NAME == 'master') {
-                                goals = 'clean deploy'
-                                profiles = 'gpg-signing,maven-central'
-                            } else {
-                                goals = 'clean verify'
-                            }
+                                if (env.BRANCH_NAME == 'master') {
+                                    goals = 'clean deploy'
+                                    profiles = 'gpg-signing,maven-central'
+                                } else {
+                                    goals = 'clean verify'
+                                }
 
-                            url = mvn.url()
-                            try {
-                                mvn.execute(goals, profiles)
-                            } finally {
-                                junit allowEmptyResults: true, testResults: '**/target/surefire-reports/TEST-*.xml'
-                            }
-                            try {
-                                recordIssues(tools: [junitParser(pattern: '**/target/surefire-reports/TEST-*.xml')])
-                            } catch(Exception e) {
+                                url = mvn.url()
+                                try {
+                                    mvn.execute(goals, profiles)
+                                } finally {
+                                    junit allowEmptyResults: true, testResults: '**/target/surefire-reports/TEST-*.xml'
+                                }
+                                try {
+                                    recordIssues(tools: [junitParser(pattern: '**/target/surefire-reports/TEST-*.xml')])
+                                } catch (Exception e) {
 
-                            }
-                            try {
-                                recordIssues(tools: [spotBugs(pattern: '**/spotbugsXml.xml', useRankAsPriority: true)])
-                            } catch(Exception e) {
+                                }
+                                try {
+                                    recordIssues(tools: [spotBugs(pattern: '**/spotbugsXml.xml', useRankAsPriority: true)])
+                                } catch (Exception e) {
 
+                                }
                             }
                         }
                     }
