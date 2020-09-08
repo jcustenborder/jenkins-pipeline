@@ -4,7 +4,7 @@ def getJdk8_docker_image() {
 }
 
 def getJdk11_docker_image() {
-    return 'docker.custenborder.com/jcustenborder/jenkins-maven-jdk11'
+    return 'docker.custenborder.com/jcustenborder/jenkins-maven-jdk11:2'
 }
 
 def getJdk8_java_home() {
