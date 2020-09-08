@@ -18,7 +18,7 @@ def execute() {
         def repositoryName = scmResult.GIT_URL.replaceAll('^.+:(.+)\\.git$', '$1')
 
         stage('build') {
-            withDockerRegistry(credentialsId: 'custenborder_docker', url: 'docker.custenborder.com') {
+            withDockerRegistry(credentialsId: 'custenborder_docker', url: 'https://docker.custenborder.com') {
                 docker.image(images.jdk11_docker_image).inside("--net host -e DOCKER_HOST='tcp://127.0.0.1:2375'") {
                     withCredentials([file(credentialsId: 'gpg_pubring', variable: 'GPG_PUBRING'), file(credentialsId: 'gpg_secring', variable: 'GPG_SECRING')]) {
                         configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
