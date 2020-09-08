@@ -43,6 +43,16 @@ def execute() {
                             } finally {
                                 junit allowEmptyResults: true, testResults: '**/target/surefire-reports/TEST-*.xml'
                             }
+                            try {
+                                recordIssues(tools: [junitParser(pattern: '**/target/surefire-reports/TEST-*.xml')])
+                            } catch(Exception e) {
+
+                            }
+                            try {
+                                recordIssues(tools: [spotBugs(pattern: '**/spotbugsXml.xml', useRankAsPriority: true)])
+                            } catch(Exception e) {
+
+                            }
                         }
                     }
                 }
