@@ -3,7 +3,7 @@ def getJdk8_docker_image() {
     return 'jcustenborder/packaging-centos-7:45'
 }
 
-def getJDK11_docker_image() {
+def getJdk11_docker_image() {
     return 'jcustenborder/jenkins-maven-jdk11'
 }
 
