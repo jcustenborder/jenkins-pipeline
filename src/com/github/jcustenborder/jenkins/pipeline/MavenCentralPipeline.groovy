@@ -21,7 +21,7 @@ def execute() {
             withDockerRegistry(credentialsId: 'custenborder_docker', url: 'https://docker.custenborder.com') {
                 docker.image(images.jdk11_docker_image).inside("--net host -e DOCKER_HOST='tcp://127.0.0.1:2375'") {
                     withCredentials([file(credentialsId: 'gpg_pubring', variable: 'GPG_PUBRING'), file(credentialsId: 'gpg_secring', variable: 'GPG_SECRING')]) {
-                        sh "gpg --batch --import '${GPG_SECRING}'"
+
                         configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
                             withEnv(['DOCKER_HOST=tcp://127.0.0.1:2375']) {
                                 def mvn = new MavenUtilities(env, steps, MAVEN_SETTINGS, GPG_PUBRING, GPG_SECRING)

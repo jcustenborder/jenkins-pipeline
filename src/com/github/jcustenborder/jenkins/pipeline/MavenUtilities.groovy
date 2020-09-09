@@ -55,6 +55,8 @@ class MavenUtilities implements Serializable {
         }
         if (null != this.secringPath) {
             commandLine << " -Dgpg.secretKeyring=${this.secringPath}"
+            steps.sh "gpg --version"
+            steps.sh "gpg --batch --import '${this.secringPath}'"
         }
 
         if (null != this.settingsPath) {
