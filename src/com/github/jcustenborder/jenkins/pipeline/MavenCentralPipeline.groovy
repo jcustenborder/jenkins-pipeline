@@ -34,6 +34,7 @@ def execute() {
                                 if (env.BRANCH_NAME == 'master') {
                                     goals = 'clean deploy'
                                     profiles = 'gpg-signing,maven-central'
+                                    sh 'gpg --list-keys'
                                 } else {
                                     goals = 'clean verify'
                                 }
