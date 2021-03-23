@@ -57,7 +57,7 @@ def execute() {
             writeFile file: "target/RELEASENOTES.md", text: changelog
             archiveArtifacts artifacts: "target/RELEASENOTES.md", allowEmptyArchive: true
 
-            if (branches.isMainBranch(env.BRANCH_NAME)) {
+            if (Branches.isMainBranch(env.BRANCH_NAME)) {
                 withCredentials([string(credentialsId: 'github_api_token', variable: 'apiToken')]) {
                     githubRelease(
                             commitish: scmResult.GIT_COMMIT,

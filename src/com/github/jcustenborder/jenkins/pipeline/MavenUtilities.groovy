@@ -30,7 +30,7 @@ class MavenUtilities implements Serializable {
     def changeVersion() {
         def pom = steps.readMavenPom()
 
-        if (!branches.isMainBranch(env.BRANCH_NAME)) {
+        if (!Branches.isMainBranch(env.BRANCH_NAME)) {
             steps.echo "version changes only on master. Current branch is ${env.BRANCH_NAME}"
             return pom.version
         }
