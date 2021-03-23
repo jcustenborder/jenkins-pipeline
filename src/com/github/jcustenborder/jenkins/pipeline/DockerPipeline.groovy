@@ -30,7 +30,7 @@ def execute() {
         def repositoryName = scmResult.GIT_URL.replaceAll('^.+:(.+)\\.git$', '$1')
         def versions = []
 
-        if (env.BRANCH_NAME == 'master') {
+        if (branches.isMainBranch(env.BRANCH_NAME)) {
             versions.add("latest")
             versions.add("${majorVersion}.${minorVersion}.${env.BUILD_NUMBER}")
         } else {
@@ -51,7 +51,7 @@ def execute() {
                 }
             }
 
-            if (env.BRANCH_NAME == 'master') {
+            if (branches.isMainBranch(env.BRANCH_NAME)) {
                 def changelogGenerator = new ReleaseNoteGenerator(scmResult, steps)
                 def changelog = changelogGenerator.generate()
                 def version = "${majorVersion}.${minorVersion}.${env.BUILD_NUMBER}"

@@ -32,7 +32,7 @@ def execute() {
                                 def goals
                                 def profiles = null
 
-                                if (env.BRANCH_NAME == 'master') {
+                                if (branches.isMainBranch(env.BRANCH_NAME)) {
                                     goals = 'clean deploy'
                                     profiles = 'gpg-signing,maven-central'
                                     sh 'gpg --list-keys'
@@ -68,7 +68,7 @@ def execute() {
             writeFile file: "target/RELEASENOTES.md", text: changelog
             archiveArtifacts artifacts: "target/RELEASENOTES.md", allowEmptyArchive: true
 
-            if (env.BRANCH_NAME == 'master') {
+            if (branches.isMainBranch(env.BRANCH_NAME)) {
                 withCredentials([string(credentialsId: 'github_api_token', variable: 'apiToken')]) {
                     githubRelease(
                             commitish: scmResult.GIT_COMMIT,
