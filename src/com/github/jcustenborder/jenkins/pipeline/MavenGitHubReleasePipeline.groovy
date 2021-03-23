@@ -4,12 +4,12 @@ def execute() {
     def version
     def artifactId
     def description
-    def repositoryName = scmResult.GIT_URL.replaceAll('^.+:(.+)\\.git$', '$1')
+
 
     node {
         deleteDir()
         def scmResult = checkout(scm)
-
+        def repositoryName = scmResult.GIT_URL.replaceAll('^.+:(.+)\\.git$', '$1')
         docker.image(images.jdk8_docker_image).inside("--net host -e DOCKER_HOST='tcp://127.0.0.1:2375'") {
             withCredentials([file(credentialsId: 'gpg_pubring', variable: 'GPG_PUBRING'), file(credentialsId: 'gpg_secring', variable: 'GPG_SECRING')]) {
                 configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
