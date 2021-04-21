@@ -1,6 +1,6 @@
 
 def getJdk8_docker_image() {
-    return 'jcustenborder/packaging-centos-7:45'
+    return 'jcustenborder/jenkins-maven-jdk8:0.0.5'
 }
 
 def getJdk11_docker_image() {
