@@ -25,7 +25,7 @@ def execute() {
 
         // This step should not normally be used in your script. Consult the inline help for details.
         withDockerRegistry(credentialsId: 'custenborder_docker', url: 'https://docker.custenborder.com') {
-            docker.image(images.jdk11_docker_image).inside("--net host -e DOCKER_HOST='tcp://127.0.0.1:2375'") {
+            docker.image(images.jdk8_docker_image).inside("--net host -e DOCKER_HOST='tcp://127.0.0.1:2375'") {
                 configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {
                     def mvn = new MavenUtilities(env, steps, "$MAVEN_SETTINGS")
                     artifactId = mvn.artifactId()
