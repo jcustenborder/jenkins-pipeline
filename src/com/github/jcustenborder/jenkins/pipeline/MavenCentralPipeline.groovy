@@ -2,7 +2,7 @@ package com.github.jcustenborder.jenkins.pipeline
 
 import groovy.transform.Field
 
-@Field def javaVersion = 8
+@Field int javaVersion = 8
 
 properties([
         buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '10'))
