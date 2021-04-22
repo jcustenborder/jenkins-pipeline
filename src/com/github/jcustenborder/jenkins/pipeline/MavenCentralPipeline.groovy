@@ -1,10 +1,12 @@
 package com.github.jcustenborder.jenkins.pipeline
 
-def int javaVersion = 8
+import groovy.transform.Field
 
-//properties([
-//        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '10'))
-//])
+@Field int javaVersion = 8;
+
+properties([
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '10'))
+])
 
 
 def execute() {
