@@ -4,6 +4,7 @@ properties([
         buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '10'))
 ])
 
+int javaVersion = 8
 
 def execute() {
     def version
@@ -11,6 +12,7 @@ def execute() {
     def description
     def url
 
+    def dockerImage = jdk_image(javaVersion)
 
     node {
         deleteDir()
@@ -19,7 +21,7 @@ def execute() {
 
         stage('build') {
             withDockerRegistry(credentialsId: 'custenborder_docker', url: 'https://docker.custenborder.com') {
-                docker.image(images.jdk11_docker_image).inside("--net host -e DOCKER_HOST='tcp://127.0.0.1:2375'") {
+                docker.image(dockerImage).inside("--net host -e DOCKER_HOST='tcp://127.0.0.1:2375'") {
                     withCredentials([file(credentialsId: 'gpg_pubring', variable: 'GPG_PUBRING'), file(credentialsId: 'gpg_secring', variable: 'GPG_SECRING')]) {
 
                         configFileProvider([configFile(fileId: 'mavenSettings', variable: 'MAVEN_SETTINGS')]) {

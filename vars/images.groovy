@@ -10,3 +10,20 @@ def getJdk11_docker_image() {
 def getJdk8_java_home() {
     return '/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.144-0.b01.el7_4.x86_64'
 }
+
+String getJdkImage(int image) {
+    String result
+
+    switch (image) {
+        case 8:
+            result = 'docker.custenborder.com/jcustenborder/jenkins-maven-jdk8:0.0.5'
+            break;
+        case 11:
+            result = 'docker.custenborder.com/jcustenborder/jenkins-maven-jdk11:0.0.2'
+            break;
+        default:
+            throw new Exception("${image} is not a supported Java Version")
+    }
+
+    return result
+}
