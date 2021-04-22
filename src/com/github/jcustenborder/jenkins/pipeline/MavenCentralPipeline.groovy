@@ -12,7 +12,7 @@ def execute() {
     def description
     def url
 
-    def dockerImage = jdk_image(javaVersion)
+    def dockerImage = Images.getJdkImage(javaVersion)
 
     node {
         deleteDir()
