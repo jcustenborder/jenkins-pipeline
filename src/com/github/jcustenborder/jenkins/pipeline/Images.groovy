@@ -1,10 +1,10 @@
 package com.github.jcustenborder.jenkins.pipeline
 
 class Images {
-    static String getJdkImage(int image) {
+    static String getJdkImage(version) {
         String result
 
-        switch (image) {
+        switch (version) {
             case 8:
                 result = 'docker.custenborder.com/jcustenborder/jenkins-maven-jdk8:0.0.5'
                 break;
@@ -12,7 +12,8 @@ class Images {
                 result = 'docker.custenborder.com/jcustenborder/jenkins-maven-jdk11:0.0.2'
                 break;
             default:
-                throw new Exception("${image} is not a supported Java Version")
+                result = 'docker.custenborder.com/jcustenborder/jenkins-maven-jdk8:0.0.5'
+                break;
         }
 
         return result

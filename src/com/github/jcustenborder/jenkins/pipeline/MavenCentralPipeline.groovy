@@ -4,7 +4,7 @@ properties([
         buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '10'))
 ])
 
-def javaVersion = 8
+def javaVersion
 
 def execute() {
     def version
