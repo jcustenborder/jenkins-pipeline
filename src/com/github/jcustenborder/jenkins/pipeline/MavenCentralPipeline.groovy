@@ -1,10 +1,10 @@
 package com.github.jcustenborder.jenkins.pipeline
 
-int javaVersion = 8
+def int javaVersion = 8
 
-properties([
-        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '10'))
-])
+//properties([
+//        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '10'))
+//])
 
 
 def execute() {
