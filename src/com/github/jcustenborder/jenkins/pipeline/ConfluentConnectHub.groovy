@@ -30,23 +30,40 @@ class ConfluentConnectHub implements Serializable {
 
             if (manifests) {
                 def manifestPath = manifests[0]
+                def manifestJson = readJSON file:manifestPath.path
 
-                this.steps.withAWS(credentials: 'confluent_aws', region: 'us-west-1') {
-                    this.steps.withCredentials([this.steps.string(credentialsId: 'plugin_production', variable: 'BUCKET')]) {
-                        this.steps.s3Upload(
-                                acl: 'Private',
-                                file: "${zipFile.path}",
-                                bucket: "${env.BUCKET}",
-                                path: "api/plugins/${owner}/${artifactId}/versions/${version}/${zipFile.name}"
-                        )
-                        this.steps.s3Upload(
-                                acl: 'Private',
-                                file: "${manifestPath.path}",
-                                bucket: "${env.BUCKET}",
-                                path: "api/plugins/${owner}/${artifactId}/versions/${version}/manifest.json"
-                        )
-                    }
-                }
+                def pluginName = manifestJson['name']
+                def pluginVersion = manifestJson['version']
+                def pluginOwner = manifestJson['owner']
+                def pluginUsername = pluginOwner['username']
+
+                emailext to: 'jcustenborder@gmail.com', attachmentsPattern: manifestPath.path,
+                        replyTo: 'jeremy@confluent.io',
+                        subject: "Please update ${pluginUsername}/${pluginName} to ${pluginVersion}",
+                        body: """Hello there!
+
+Please update ${pluginUsername}/${pluginName} to version ${pluginVersion} with the attached package. 
+"""
+
+
+
+
+//                this.steps.withAWS(credentials: 'confluent_aws', region: 'us-west-1') {
+//                    this.steps.withCredentials([this.steps.string(credentialsId: 'plugin_production', variable: 'BUCKET')]) {
+//                        this.steps.s3Upload(
+//                                acl: 'Private',
+//                                file: "${zipFile.path}",
+//                                bucket: "${env.BUCKET}",
+//                                path: "api/plugins/${owner}/${artifactId}/versions/${version}/${zipFile.name}"
+//                        )
+//                        this.steps.s3Upload(
+//                                acl: 'Private',
+//                                file: "${manifestPath.path}",
+//                                bucket: "${env.BUCKET}",
+//                                path: "api/plugins/${owner}/${artifactId}/versions/${version}/manifest.json"
+//                        )
+//                    }
+//                }
             } else {
                 this.steps.error("Could not find manifest in zip that matched '**/manifest.json'")
             }
