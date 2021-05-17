@@ -30,14 +30,14 @@ class ConfluentConnectHub implements Serializable {
 
             if (manifests) {
                 def manifestPath = manifests[0]
-                def manifestJson = readJSON file:manifestPath.path
+                def manifestJson = this.steps.readJSON file:manifestPath.path
 
                 def pluginName = manifestJson['name']
                 def pluginVersion = manifestJson['version']
                 def pluginOwner = manifestJson['owner']
                 def pluginUsername = pluginOwner['username']
 
-                emailext to: 'jcustenborder@gmail.com', attachmentsPattern: manifestPath.path,
+                this.steps.emailext to: 'jcustenborder@gmail.com', attachmentsPattern: manifestPath.path,
                         replyTo: 'jeremy@confluent.io',
                         subject: "Please update ${pluginUsername}/${pluginName} to ${pluginVersion}",
                         body: """Hello there!
