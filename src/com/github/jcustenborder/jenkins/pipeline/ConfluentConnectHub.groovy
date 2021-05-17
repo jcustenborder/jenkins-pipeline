@@ -38,7 +38,6 @@ class ConfluentConnectHub implements Serializable {
                 def pluginUsername = pluginOwner['username']
 
                 this.steps.emailext to: 'jcustenborder@gmail.com', attachmentsPattern: manifestPath.path,
-                        replyTo: 'jeremy@confluent.io',
                         subject: "Please update ${pluginUsername}/${pluginName} to ${pluginVersion}",
                         body: """Hello there!
 
