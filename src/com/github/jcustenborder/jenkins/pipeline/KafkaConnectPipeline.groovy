@@ -34,22 +34,12 @@ def execute() {
                     version = mvn.changeVersion()
                     stage('build') {
                         try {
-                            mvn.execute('clean test')
+                            mvn.execute('clean test integration-test package')
                         }
                         finally {
                             junit allowEmptyResults: true, testResults: '**/target/surefire-reports/TEST-*.xml'
-                        }
-                    }
-                    stage('integration-test') {
-                        try {
-                            mvn.execute('integration-test')
-                        }
-                        finally {
                             junit allowEmptyResults: true, testResults: '**/target/failsafe-reports/TEST-*.xml'
                         }
-                    }
-                    stage('maven package') {
-                        mvn.execute('package')
                         sh "ls -1 target/"
                         echo 'Stashing target/docs/**/**'
                         stash includes: 'target/docs/**/**', name: 'docs'
