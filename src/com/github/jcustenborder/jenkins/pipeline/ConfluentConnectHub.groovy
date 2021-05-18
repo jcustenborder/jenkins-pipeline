@@ -38,7 +38,7 @@ class ConfluentConnectHub implements Serializable {
                 def pluginUsername = pluginOwner['username']
 
                 this.steps.sendsafely credentialID: 'sendsafely',
-                        recipients: 'jeremy@confluent.io,jcustenborder@gmail.com',
+                        recipients: 'confluent-hub@confluent.io',
                         notify: true,
                         packageLife: 30,
                         includes: "target/**/packages/*${artifactId}-${version}*.zip",
