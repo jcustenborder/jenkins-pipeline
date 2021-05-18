@@ -37,14 +37,11 @@ class ConfluentConnectHub implements Serializable {
                 def pluginOwner = manifestJson['owner']
                 def pluginUsername = pluginOwner['username']
 
-                this.steps.emailext to: 'jcustenborder@gmail.com', attachmentsPattern: manifestPath.path,
-                        subject: "Please update ${pluginUsername}/${pluginName} to ${pluginVersion}",
-                        body: """Hello there!
-
-Please update ${pluginUsername}/${pluginName} to version ${pluginVersion} with the attached package. 
-"""
-
-
+                this.steps.sendsafely credentialID: 'sendsafely',
+                        recipients: 'jeremy@confluent.io,jcustenborder@gmail.com',
+                        notify: true,
+                        packageLife: 30,
+                        includes: "target/**/packages/*${artifactId}-${version}*.zip"
 
 
 //                this.steps.withAWS(credentials: 'confluent_aws', region: 'us-west-1') {
