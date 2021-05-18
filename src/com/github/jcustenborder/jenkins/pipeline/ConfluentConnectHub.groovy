@@ -41,7 +41,11 @@ class ConfluentConnectHub implements Serializable {
                         recipients: 'jeremy@confluent.io,jcustenborder@gmail.com',
                         notify: true,
                         packageLife: 30,
-                        includes: "target/**/packages/*${artifactId}-${version}*.zip"
+                        includes: "target/**/packages/*${artifactId}-${version}*.zip",
+                        message: """Hello there!
+
+Please update ${pluginUsername}/${pluginName} to version ${pluginVersion} with the attached package.
+"""
 
 
 //                this.steps.withAWS(credentials: 'confluent_aws', region: 'us-west-1') {
