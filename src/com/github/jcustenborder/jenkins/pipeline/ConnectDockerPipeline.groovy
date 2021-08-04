@@ -32,7 +32,7 @@ def execute() {
             scmResult = checkout(scm)
         }
         def repositoryName = scmResult.GIT_URL.replaceAll('^.+:(.+)\\.git$', '$1')
-        def version = "${majorVersion}.${minorVersion}.${env.BUILD_NUMBER}"
+        def version = "${majorVersion}.${minorVersion}.${patchVersion}-${env.BUILD_NUMBER}"
         def labels = [
                 "${majorVersion}.${minorVersion}.${patchVersion}",
                 version
