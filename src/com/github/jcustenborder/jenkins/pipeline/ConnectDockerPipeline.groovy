@@ -51,19 +51,9 @@ def execute() {
                 }
             }
 
-            def changelogGenerator = new ReleaseNoteGenerator(scmResult, steps)
-            def changelog = changelogGenerator.generate()
-
-            writeFile file: "RELEASENOTES.md", text: changelog
-            withCredentials([string(credentialsId: 'github_api_token', variable: 'apiToken')]) {
-                githubRelease(
-                        commitish: scmResult.GIT_COMMIT,
-                        token: apiToken,
-                        description: "${changelog}",
-                        repositoryName: repositoryName,
-                        tagName: version,
-                        includes: "RELEASENOTES.md"
-                )
+            sh "git tag ${version}"
+            sshagent(credentials: ['50a4ec3a-9caf-43d1-bfab-6465b47292da']) {
+                sh "git push 'origin' '${version}'"
             }
         }
     }
