@@ -6,7 +6,7 @@ class Images {
 
         switch (version) {
             case 8:
-                result = 'docker.custenborder.com/jcustenborder/jenkins-maven-jdk8:0.0.5'
+                result = 'docker.custenborder.com/jcustenborder/jenkins-maven-jdk8:0.0.6'
                 break;
             case 11:
                 result = 'docker.custenborder.com/jcustenborder/jenkins-maven-jdk11:0.0.2'
