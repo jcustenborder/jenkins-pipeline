@@ -40,8 +40,8 @@ def execute() {
                             stage('maven package') {
                                 mvn.execute('package')
                                 sh "ls -1 target/"
-                                echo 'Stashing target/${artifactId}-${version}.*'
-                                sh "ls -1 target/${artifactId}-${version}.*"
+                                echo "Stashing ${artifacts}"
+                                sh "ls -1 ${artifacts}"
                                 stash includes: artifacts, name: 'assembly', allowEmpty: false
                             }
                         }
