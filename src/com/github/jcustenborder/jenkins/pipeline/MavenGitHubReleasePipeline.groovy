@@ -1,5 +1,7 @@
 package com.github.jcustenborder.jenkins.pipeline
 
+def artifacts = "target/${artifactId}-${version}.*"
+
 def execute() {
     def version
     def artifactId
@@ -40,7 +42,7 @@ def execute() {
                                 sh "ls -1 target/"
                                 echo 'Stashing target/${artifactId}-${version}.*'
                                 sh "ls -1 target/${artifactId}-${version}.*"
-                                stash includes: "target/${artifactId}-${version}.*", name: 'assembly', allowEmpty: false
+                                stash includes: artifacts, name: 'assembly', allowEmpty: false
                             }
                         }
                     }
@@ -49,7 +51,7 @@ def execute() {
         }
         stage('publish') {
             unstash 'assembly'
-            archiveArtifacts artifacts: "target/${artifactId}-${version}.*"
+            archiveArtifacts artifacts: artifacts
 
             def changelogGenerator = new ReleaseNoteGenerator(scmResult, steps)
             def changelog = changelogGenerator.generate()
@@ -65,7 +67,7 @@ def execute() {
                             description: "${changelog}",
                             repositoryName: repositoryName,
                             tagName: version,
-                            includes: "target/${artifactId}-${version}.*",
+                            includes: artifacts,
                             excludes: 'target/*.jar'
                     )
                 }
